@@ -93,3 +93,12 @@ variable "www_website_bucket_force_destroy" {
   type        = bool
   default     = false
 }
+
+#------------------------------------------------------------------------------
+# Cloudfront
+#------------------------------------------------------------------------------
+variable "enable_cloudfront" {
+  description = "Indicates if Cloudfront should be created or not"
+  type        = bool
+  default     = true
+}
