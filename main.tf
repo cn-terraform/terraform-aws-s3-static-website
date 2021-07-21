@@ -6,6 +6,16 @@ locals {
   www_website_bucket_name = "www.${var.website_domain_name}"
 }
 
+
+resource "aws_s3_bucket" "log_bucket" {
+  bucket = "${var.name_prefix}-log-bucket"
+  acl    = "log-delivery-write"
+
+  tags = merge({
+    Name = "${var.name_prefix}-logs"
+  }, var.tags)
+}
+
 #------------------------------------------------------------------------------
 # Website S3 Bucket
 #------------------------------------------------------------------------------
@@ -20,7 +30,6 @@ resource "aws_s3_bucket" "website" {
   bucket        = local.website_bucket_name
   acl           = "public-read"
   policy        = data.template_file.website_bucket_policy.rendered
-  tags          = var.tags
   force_destroy = var.website_bucket_force_destroy
 
   website {
@@ -41,10 +50,10 @@ resource "aws_s3_bucket" "website" {
     mfa_delete = var.website_versioning_mfa_delete
   }
 
-  # TODO - Add log
-  # logging - (Optional) A settings of bucket logging.
-  #   target_bucket - (Required) The name of the bucket that will receive the log objects.
-  #   target_prefix - (Optional) To specify a key prefix for log objects.
+  logging {
+    target_bucket = aws_s3_bucket.log_bucket.id
+    target_prefix = "website/"
+  }
 
   # TODO - Add Lifecyle rule parameters
   # lifecycle_rule - (Optional) A configuration of object lifecycle management.
@@ -59,6 +68,10 @@ resource "aws_s3_bucket" "website" {
 
   # TODO - Add variables for S3 object locking
   # object_lock_configuration - (Optional) A configuration of S3 object locking
+
+  tags = merge({
+    Name = "${var.name_prefix}-website"
+  }, var.tags)
 }
 
 #------------------------------------------------------------------------------
@@ -75,10 +88,22 @@ resource "aws_s3_bucket" "www_website" {
   bucket        = local.www_website_bucket_name
   acl           = "public-read"
   policy        = data.template_file.www_website_bucket_policy.rendered
-  tags          = var.tags
   force_destroy = var.www_website_bucket_force_destroy
 
   website {
     redirect_all_requests_to = var.website_domain_name
   }
+
+  logging {
+    target_bucket = aws_s3_bucket.log_bucket.id
+    target_prefix = "www-website/"
+  }
+
+  tags = merge({
+    Name = "${var.name_prefix}-www-website"
+  }, var.tags)
 }
+
+
+
+
