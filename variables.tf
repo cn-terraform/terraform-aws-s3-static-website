@@ -106,13 +106,13 @@ variable "enable_cloudfront" {
 variable "comment_for_cloudfront_website" {
   description = "Comment for the Website CloudFront Distribution"
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "comment_for_cloudfront_www_website" {
   description = "Comment for the WWW Website CloudFront Distribution"
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "is_ipv6_enabled" {
