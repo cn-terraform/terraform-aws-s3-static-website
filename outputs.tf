@@ -99,62 +99,62 @@ output "www_website_bucket_website_domain" {
 #------------------------------------------------------------------------------
 output "cloudfront_website_id" {
   description = "The identifier for the distribution. For example: EDFDVBD632BHDS5."
-  value       = aws_cloudfront_distribution.website[0].id
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.website[0].id : null
 }
 
 output "cloudfront_website_arn" {
   description = "The ARN (Amazon Resource Name) for the distribution. For example: arn:aws:cloudfront::123456789012:distribution/EDFDVBD632BHDS5, where 123456789012 is your AWS account ID."
-  value       = aws_cloudfront_distribution.website[0].arn
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.website[0].arn : null
 }
 
 output "cloudfront_website_caller_reference" {
   description = "Internal value used by CloudFront to allow future updates to the distribution configuration."
-  value       = aws_cloudfront_distribution.website[0].caller_reference
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.website[0].caller_reference : null
 }
 
 output "cloudfront_website_status" {
   description = "The current status of the distribution. Deployed if the distribution's information is fully propagated throughout the Amazon CloudFront system."
-  value       = aws_cloudfront_distribution.website[0].status
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.website[0].status : null
 }
 
 output "cloudfront_website_tags_all" {
   description = "A map of tags assigned to the resource, including those inherited from the provider default_tags configuration block."
-  value       = aws_cloudfront_distribution.website[0].tags_all
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.website[0].tags_all : null
 }
 
 output "cloudfront_website_trusted_key_groups" {
   description = "List of nested attributes for active trusted key groups, if the distribution is set up to serve private content with signed URLs"
-  value       = aws_cloudfront_distribution.website[0].trusted_key_groups
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.website[0].trusted_key_groups : null
 }
 
 output "cloudfront_website_trusted_signers" {
   description = "List of nested attributes for active trusted signers, if the distribution is set up to serve private content with signed URLs"
-  value       = aws_cloudfront_distribution.website[0].trusted_signers
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.website[0].trusted_signers : null
 }
 
 output "cloudfront_website_domain_name" {
   description = "The domain name corresponding to the distribution. For example: d604721fxaaqy9.cloudfront.net."
-  value       = aws_cloudfront_distribution.website[0].domain_name
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.website[0].domain_name : null
 }
 
 output "cloudfront_website_last_modified_time" {
   description = "The date and time the distribution was last modified."
-  value       = aws_cloudfront_distribution.website[0].last_modified_time
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.website[0].last_modified_time : null
 }
 
 output "cloudfront_website_in_progress_validation_batches" {
   description = "The number of invalidation batches currently in progress."
-  value       = aws_cloudfront_distribution.website[0].in_progress_validation_batches
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.website[0].in_progress_validation_batches : null
 }
 
 output "cloudfront_website_etag" {
   description = "The current version of the distribution's information. For example: E2QWRUHAPOMQZL."
-  value       = aws_cloudfront_distribution.website[0].etag
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.website[0].etag : null
 }
 
 output "cloudfront_website_hosted_zone_id" {
   description = "The CloudFront Route 53 zone ID that can be used to route an Alias Resource Record Set to. This attribute is simply an alias for the zone ID Z2FDTNDATAQYW2."
-  value       = aws_cloudfront_distribution.website[0].hosted_zone_id
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.website[0].hosted_zone_id : null
 }
 
 #------------------------------------------------------------------------------
@@ -162,62 +162,62 @@ output "cloudfront_website_hosted_zone_id" {
 #------------------------------------------------------------------------------
 output "cloudfront_www_website_id" {
   description = "The identifier for the distribution. For example: EDFDVBD632BHDS5."
-  value       = aws_cloudfront_distribution.www_website[0].id
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.www_website[0].id : null
 }
 
 output "cloudfront_www_website_arn" {
   description = "The ARN (Amazon Resource Name) for the distribution. For example: arn:aws:cloudfront::123456789012:distribution/EDFDVBD632BHDS5, where 123456789012 is your AWS account ID."
-  value       = aws_cloudfront_distribution.www_website[0].arn
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.www_website[0].arn : null
 }
 
 output "cloudfront_www_website_caller_reference" {
   description = "Internal value used by CloudFront to allow future updates to the distribution configuration."
-  value       = aws_cloudfront_distribution.www_website[0].caller_reference
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.www_website[0].caller_reference : null
 }
 
 output "cloudfront_www_website_status" {
   description = "The current status of the distribution. Deployed if the distribution's information is fully propagated throughout the Amazon CloudFront system."
-  value       = aws_cloudfront_distribution.www_website[0].status
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.www_website[0].status : null
 }
 
 output "cloudfront_www_website_tags_all" {
   description = "A map of tags assigned to the resource, including those inherited from the provider default_tags configuration block."
-  value       = aws_cloudfront_distribution.www_website[0].tags_all
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.www_website[0].tags_all : null
 }
 
 output "cloudfront_www_website_trusted_key_groups" {
   description = "List of nested attributes for active trusted key groups, if the distribution is set up to serve private content with signed URLs"
-  value       = aws_cloudfront_distribution.www_website[0].trusted_key_groups
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.www_website[0].trusted_key_groups : null
 }
 
 output "cloudfront_www_website_trusted_signers" {
   description = "List of nested attributes for active trusted signers, if the distribution is set up to serve private content with signed URLs"
-  value       = aws_cloudfront_distribution.www_website[0].trusted_signers
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.www_website[0].trusted_signers : null
 }
 
 output "cloudfront_www_website_domain_name" {
   description = "The domain name corresponding to the distribution. For example: d604721fxaaqy9.cloudfront.net."
-  value       = aws_cloudfront_distribution.www_website[0].domain_name
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.www_website[0].domain_name : null
 }
 
 output "cloudfront_www_website_last_modified_time" {
   description = "The date and time the distribution was last modified."
-  value       = aws_cloudfront_distribution.www_website[0].last_modified_time
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.www_website[0].last_modified_time : null
 }
 
 output "cloudfront_www_website_in_progress_validation_batches" {
   description = "The number of invalidation batches currently in progress."
-  value       = aws_cloudfront_distribution.www_website[0].in_progress_validation_batches
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.www_website[0].in_progress_validation_batches : null
 }
 
 output "cloudfront_www_website_etag" {
   description = "The current version of the distribution's information. For example: E2QWRUHAPOMQZL."
-  value       = aws_cloudfront_distribution.www_website[0].etag
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.www_website[0].etag : null
 }
 
 output "cloudfront_www_website_hosted_zone_id" {
   description = "The CloudFront Route 53 zone ID that can be used to route an Alias Resource Record Set to. This attribute is simply an alias for the zone ID Z2FDTNDATAQYW2."
-  value       = aws_cloudfront_distribution.www_website[0].hosted_zone_id
+  value       = var.enable_cloudfront ? aws_cloudfront_distribution.www_website[0].hosted_zone_id : null
 }
 
 #------------------------------------------------------------------------------
