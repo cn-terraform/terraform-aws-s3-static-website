@@ -7,19 +7,6 @@ locals {
 }
 
 #------------------------------------------------------------------------------
-# KMS Key for S3 server side encryption
-#------------------------------------------------------------------------------
-resource "aws_kms_key" "s3_encryption_key" {
-  description             = "KMS Key for S3 server side encryption"
-  deletion_window_in_days = 10
-  enable_key_rotation     = true
-
-  tags = merge({
-    Name = "${var.name_prefix}-s3-enc-key"
-  }, var.tags)
-}
-
-#------------------------------------------------------------------------------
 # S3 Bucket for logs
 #------------------------------------------------------------------------------
 resource "aws_s3_bucket" "log_bucket" {
@@ -34,7 +21,7 @@ resource "aws_s3_bucket" "log_bucket" {
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
-        kms_master_key_id = aws_kms_key.s3_encryption_key.arn
+        kms_master_key_id = "aws/s3"
         sse_algorithm     = "aws:kms"
       }
     }
