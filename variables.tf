@@ -10,7 +10,6 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
-
 #------------------------------------------------------------------------------
 # Website
 #------------------------------------------------------------------------------
@@ -77,12 +76,6 @@ variable "website_versioning_mfa_delete" {
   description = "(Optional) Enable MFA delete for either Change the versioning state of your bucket or Permanently delete an object version. Default is false. This cannot be used to toggle this setting but is available to allow managed buckets to reflect the state in AWS."
   type        = bool
   default     = false
-}
-
-variable "website_acceleration_status" {
-  description = "(Optional) Sets the accelerate configuration of an existing bucket. Can be Enabled or Suspended."
-  type        = string
-  default     = "Suspended"
 }
 
 #------------------------------------------------------------------------------

@@ -40,8 +40,6 @@ resource "aws_s3_bucket" "website" {
   # TODO - Add Lifecyle rule parameters
   # lifecycle_rule - (Optional) A configuration of object lifecycle management.
 
-  acceleration_status = var.website_acceleration_status
-
   # TODO - Add replication configuration parameters
   # replication_configuration - (Optional) A configuration of replication configuration.
 
@@ -94,7 +92,7 @@ resource "aws_cloudfront_distribution" "website" {
 
   logging_config {
     include_cookies = false
-    bucket          = aws_s3_bucket.log_bucket.id
+    bucket          = aws_s3_bucket.log_bucket.bucket_domain_name
     prefix          = "cloudfront_website"
   }
 
@@ -128,7 +126,7 @@ resource "aws_cloudfront_distribution" "website" {
   # TODO - Work on SSL certificates
   # viewer_certificate (Required) - The SSL configuration for this distribution (maximum one).
   viewer_certificate {
-    cloudfront_default_certificate = true
+    cloudfront_default_certificate = false
   }
 
   # TODO - Work to add Web ACL variables
