@@ -10,12 +10,34 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+#------------------------------------------------------------------------------
+# Log Bucket
+#------------------------------------------------------------------------------
+variable "log_bucket_versioning_enabled" {
+  description = "(Optional) Enable versioning. Once you version-enable a bucket, it can never return to an unversioned state. You can, however, suspend versioning on that bucket. Defaults to true"
+  type        = bool
+  default     = true
+}
+
+variable "log_bucket_versioning_mfa_delete" {
+  description = "(Optional) Enable MFA delete for either change the versioning state of your bucket or permanently delete an object version. Default is false. This cannot be used to toggle this setting but is available to allow managed buckets to reflect the state in AWS."
+  type        = bool
+  default     = false
+}
+
 #------------------------------------------------------------------------------
 # Website
 #------------------------------------------------------------------------------
 variable "website_domain_name" {
   description = "The domain name to use for the website"
   type        = string
+}
+
+variable "website_bucket_acl" {
+  description = "(Optional) The canned ACL to apply. Valid values are private, public-read, public-read-write, aws-exec-read, authenticated-read, and log-delivery-write. Defaults to private."
+  type        = string
+  default     = "private"
 }
 
 variable "website_bucket_force_destroy" {
@@ -67,13 +89,13 @@ variable "website_cors_max_age_seconds" {
 }
 
 variable "website_versioning_enabled" {
-  description = "(Optional) Enable versioning. Once you version-enable a bucket, it can never return to an unversioned state. You can, however, suspend versioning on that bucket. Defaults to false"
+  description = "(Optional) Enable versioning. Once you version-enable a bucket, it can never return to an unversioned state. You can, however, suspend versioning on that bucket. Defaults to true"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "website_versioning_mfa_delete" {
-  description = "(Optional) Enable MFA delete for either Change the versioning state of your bucket or Permanently delete an object version. Default is false. This cannot be used to toggle this setting but is available to allow managed buckets to reflect the state in AWS."
+  description = "(Optional) Enable MFA delete for either change the versioning state of your bucket or permanently delete an object version. Default is false. This cannot be used to toggle this setting but is available to allow managed buckets to reflect the state in AWS."
   type        = bool
   default     = false
 }
@@ -81,8 +103,26 @@ variable "website_versioning_mfa_delete" {
 #------------------------------------------------------------------------------
 # WWW Website for redirection to Website
 #------------------------------------------------------------------------------
+variable "www_website_bucket_acl" {
+  description = "(Optional) The canned ACL to apply. Valid values are private, public-read, public-read-write, aws-exec-read, authenticated-read, and log-delivery-write. Defaults to private."
+  type        = string
+  default     = "private"
+}
+
 variable "www_website_bucket_force_destroy" {
   description = "(Optional, Default:false) A boolean that indicates all objects (including any locked objects) should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable."
+  type        = bool
+  default     = false
+}
+
+variable "www_website_versioning_enabled" {
+  description = "(Optional) Enable versioning. Once you version-enable a bucket, it can never return to an unversioned state. You can, however, suspend versioning on that bucket. Defaults to true"
+  type        = bool
+  default     = true
+}
+
+variable "www_website_versioning_mfa_delete" {
+  description = "(Optional) Enable MFA delete for either change the versioning state of your bucket or permanently delete an object version. Default is false. This cannot be used to toggle this setting but is available to allow managed buckets to reflect the state in AWS."
   type        = bool
   default     = false
 }
@@ -106,6 +146,12 @@ variable "comment_for_cloudfront_www_website" {
   description = "Comment for the WWW Website CloudFront Distribution"
   type        = string
   default     = ""
+}
+
+variable "cloudfront_viewer_protocol_policy" {
+  description = "Use this element to specify the protocol that users can use to access the files in the origin specified by TargetOriginId when a request matches the path pattern in PathPattern. One of allow-all, https-only, or redirect-to-https. Defautls to redirect-to-https"
+  type        = string
+  default     = "redirect-to-https"
 }
 
 variable "is_ipv6_enabled" {
@@ -202,4 +248,10 @@ variable "cloudfront_viewer_certificate_ssl_support_method" {
   description = "Specifies how you want CloudFront to serve HTTPS requests. One of vip or sni-only. Required if you specify acm_certificate_arn or iam_certificate_id. NOTE: vip causes CloudFront to use a dedicated IP address and may incur extra charges."
   type        = string
   default     = "sni-only"
+}
+
+variable "cloudfront_viewer_certificate_minimum_protocol_version" {
+  description = "The minimum version of the SSL protocol that you want CloudFront to use for HTTPS connections. One of SSLv3, TLSv1, TLSv1_2016, TLSv1.1_2016, TLSv1.2_2018 or TLSv1.2_2019. Default: TLSv1. NOTE: If you are using a custom certificate (specified with acm_certificate_arn or iam_certificate_id), and have specified sni-only in ssl_support_method, TLSv1 or later must be specified. If you have specified vip in ssl_support_method, only SSLv3 or TLSv1 can be specified. If you have specified cloudfront_default_certificate, TLSv1 must be specified."
+  type        = string
+  default     = "TLSv1"
 }

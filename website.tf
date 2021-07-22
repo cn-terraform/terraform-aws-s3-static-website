@@ -8,10 +8,12 @@ data "template_file" "website_bucket_policy" {
   }
 }
 
+# tfsec issues ignored (https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html)
+#  - AWS001: The contents of the bucket can be accessed publicly. Access should be allowed because it is hosting a website
 resource "aws_s3_bucket" "website" {
   bucket        = local.website_bucket_name
-  acl           = "public-read"
-  policy        = data.template_file.website_bucket_policy.rendered
+  acl           = var.website_bucket_acl
+  policy        = data.template_file.website_bucket_policy.rendered # tfsec:ignore:AWS001
   force_destroy = var.website_bucket_force_destroy
 
   website {
@@ -43,8 +45,14 @@ resource "aws_s3_bucket" "website" {
   # TODO - Add replication configuration parameters
   # replication_configuration - (Optional) A configuration of replication configuration.
 
-  # TODO - Add server side encryption
-  # server_side_encryption_configuration - (Optional) A configuration of server-side encryption configuration
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        kms_master_key_id = aws_kms_key.s3_encryption_key.arn
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
 
   # TODO - Add variables for S3 object locking
   # object_lock_configuration - (Optional) A configuration of S3 object locking
@@ -54,10 +62,27 @@ resource "aws_s3_bucket" "website" {
   }, var.tags)
 }
 
+# tfsec issues ignored (https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html)
+#  - AWS073: PUT calls with public ACLs specified can make objects public. Should be disabled for bucket hosting a website
+#  - AWS074: PUT calls with public ACLs specified can make objects public. Should be disabled for bucket hosting a website
+#  - AWS075: Public buckets can be accessed by anyone. Should be disabled for bucket hosting a website
+#  - AWS076: Users could put a policy that allows public access. Should be disabled for bucket hosting a website
+resource "aws_s3_bucket_public_access_block" "website_bucket_public_access_block" {
+  bucket = aws_s3_bucket.website.id
+
+  ignore_public_acls      = false # tfsec:ignore:AWS073
+  block_public_acls       = false # tfsec:ignore:AWS074
+  restrict_public_buckets = false # tfsec:ignore:AWS075
+  block_public_policy     = false # tfsec:ignore:AWS076
+}
+
 #------------------------------------------------------------------------------
 # Cloudfront for S3 Bucket Website
 #------------------------------------------------------------------------------
-resource "aws_cloudfront_distribution" "website" {
+# tfsec issues ignored
+#  - AWS045: Enable WAF for the CloudFront distribution. Pending to implement.
+#  - AWS021: Use the most modern TLS/SSL policies available. Cannot use latest because of default CF certificate
+resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
   count = var.enable_cloudfront ? 1 : 0
 
   #   aliases = [local.website_bucket_name]
@@ -70,7 +95,7 @@ resource "aws_cloudfront_distribution" "website" {
     allowed_methods        = var.cloudfront_allowed_cached_methods
     cached_methods         = var.cloudfront_allowed_cached_methods
     target_origin_id       = "S3-.${local.website_bucket_name}"
-    viewer_protocol_policy = "allow-all" # Change to "redirect-to-https" when HTTPS supported
+    viewer_protocol_policy = var.cloudfront_viewer_protocol_policy
 
     # min_ttl                = 31536000
     # default_ttl            = 31536000
@@ -128,6 +153,7 @@ resource "aws_cloudfront_distribution" "website" {
   viewer_certificate {
     cloudfront_default_certificate = true
     ssl_support_method             = var.cloudfront_viewer_certificate_ssl_support_method
+    minimum_protocol_version       = var.cloudfront_viewer_certificate_minimum_protocol_version # tfsec:ignore:AWS021
   }
 
   # TODO - Work to add Web ACL variables
