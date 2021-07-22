@@ -60,7 +60,7 @@ resource "aws_s3_bucket" "website" {
 resource "aws_cloudfront_distribution" "website" {
   count = var.enable_cloudfront ? 1 : 0
 
-  aliases = [local.website_bucket_name]
+  #   aliases = [local.website_bucket_name]
   comment = var.comment_for_cloudfront_website
 
   # TODO - Add variable for Custom Error Responses
@@ -126,7 +126,8 @@ resource "aws_cloudfront_distribution" "website" {
   # TODO - Work on SSL certificates
   # viewer_certificate (Required) - The SSL configuration for this distribution (maximum one).
   viewer_certificate {
-    cloudfront_default_certificate = false
+    cloudfront_default_certificate = true
+    ssl_support_method             = var.cloudfront_viewer_certificate_ssl_support_method
   }
 
   # TODO - Work to add Web ACL variables
