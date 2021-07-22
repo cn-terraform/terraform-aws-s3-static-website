@@ -197,3 +197,9 @@ variable "cloudfront_www_website_wait_for_deployment" {
   type        = bool
   default     = true
 }
+
+variable "cloudfront_viewer_certificate_ssl_support_method" {
+  description = "Specifies how you want CloudFront to serve HTTPS requests. One of vip or sni-only. Required if you specify acm_certificate_arn or iam_certificate_id. NOTE: vip causes CloudFront to use a dedicated IP address and may incur extra charges."
+  type        = string
+  default     = "sni-only"
+}
