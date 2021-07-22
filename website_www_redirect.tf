@@ -72,23 +72,14 @@ resource "aws_cloudfront_distribution" "www_website" { # tfsec:ignore:AWS045
   # TODO - Add variable for Custom Error Responses
   # custom_error_response (Optional) - One or more custom error response elements (multiples allowed).
 
+  # TODO - Add variables for cache and origin request policies.
   default_cache_behavior {
-    allowed_methods        = var.cloudfront_allowed_cached_methods
-    cached_methods         = var.cloudfront_allowed_cached_methods
-    target_origin_id       = "S3-${local.www_website_bucket_name}"
-    viewer_protocol_policy = var.cloudfront_viewer_protocol_policy
-
-    # min_ttl                = 0
-    # default_ttl            = 86400
-    # max_ttl                = 31536000
-
-    forwarded_values {
-      query_string = true
-      headers      = ["Origin"]
-      cookies {
-        forward = "none"
-      }
-    }
+    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6" # Managed-CachingOptimized
+    origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # Managed-CORS-S3Origin
+    allowed_methods          = var.cloudfront_allowed_cached_methods
+    cached_methods           = var.cloudfront_allowed_cached_methods
+    target_origin_id         = "S3-${local.www_website_bucket_name}"
+    viewer_protocol_policy   = var.cloudfront_viewer_protocol_policy
   }
 
   enabled         = true
