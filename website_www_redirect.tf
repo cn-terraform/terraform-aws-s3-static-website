@@ -99,7 +99,7 @@ resource "aws_cloudfront_distribution" "www_website" {
   # TODO - Work on SSL certificates
   # viewer_certificate (Required) - The SSL configuration for this distribution (maximum one).
   viewer_certificate {
-    cloudfront_default_certificate = true
+    cloudfront_default_certificate = false
   }
 
   # TODO - Work to add Web ACL variables
