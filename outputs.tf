@@ -94,10 +94,6 @@ output "www_website_bucket_website_domain" {
   value       = aws_s3_bucket.www_website.website_domain
 }
 
-
-
-
-
 #------------------------------------------------------------------------------
 # Cloudfront for S3 Bucket Website
 #------------------------------------------------------------------------------

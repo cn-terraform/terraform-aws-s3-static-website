@@ -40,8 +40,6 @@ resource "aws_s3_bucket" "website" {
   # TODO - Add Lifecyle rule parameters
   # lifecycle_rule - (Optional) A configuration of object lifecycle management.
 
-  acceleration_status = var.website_acceleration_status
-
   # TODO - Add replication configuration parameters
   # replication_configuration - (Optional) A configuration of replication configuration.
 
