@@ -93,3 +93,114 @@ variable "www_website_bucket_force_destroy" {
   type        = bool
   default     = false
 }
+
+#------------------------------------------------------------------------------
+# Cloudfront
+#------------------------------------------------------------------------------
+variable "enable_cloudfront" {
+  description = "Indicates if Cloudfront should be created or not"
+  type        = bool
+  default     = true
+}
+
+variable "comment_for_cloudfront_website" {
+  description = "Comment for the Website CloudFront Distribution"
+  type        = string
+  default     = null
+}
+
+variable "comment_for_cloudfront_www_website" {
+  description = "Comment for the WWW Website CloudFront Distribution"
+  type        = string
+  default     = null
+}
+
+variable "is_ipv6_enabled" {
+  description = "(Optional) - Whether the IPv6 is enabled for the distribution. Defaults to true"
+  type        = bool
+  default     = true
+}
+
+variable "cloudfront_allowed_cached_methods" {
+  description = "(Optional) Specifies which methods are allowed and cached by CloudFront. Can be GET, PUT, POST, DELETE or HEAD. Defaults to GET and HEAD"
+  type        = list(string)
+  default     = ["GET", "HEAD"]
+}
+
+variable "cloudfront_default_root_object" {
+  description = "(Optional) - The object that you want CloudFront to return (for example, index.html) when an end user requests the root URL. Defaults to index.html"
+  type        = string
+  default     = "index.html"
+}
+
+variable "cloudfront_http_version" {
+  description = "(Optional) - The maximum HTTP version to support on the distribution. Allowed values are http1.1 and http2. The default is http2."
+  type        = string
+  default     = "http2"
+}
+
+variable "cloudfront_origin_http_port" {
+  description = "The HTTP port the custom origin listens on. Defaults to 80"
+  type        = number
+  default     = 80
+}
+
+variable "cloudfront_origin_https_port" {
+  description = "The HTTPS port the custom origin listens on. Defaults to 443"
+  type        = number
+  default     = 443
+}
+
+variable "cloudfront_origin_protocol_policy" {
+  description = "The origin protocol policy to apply to your origin. One of http-only, https-only, or match-viewer."
+  type        = string
+  default     = "match-viewer"
+}
+
+variable "cloudfront_origin_ssl_protocols" {
+  description = "The SSL/TLS protocols that you want CloudFront to use when communicating with your origin over HTTPS. A list of one or more of SSLv3, TLSv1, TLSv1.1, and TLSv1.2. Defaults to TLSv1, TLSv1.1 and TLSv1.2"
+  type        = list(string)
+  default     = ["TLSv1", "TLSv1.1", "TLSv1.2"]
+}
+
+variable "cloudfront_price_class" {
+  description = "(Optional) - The price class for this distribution. One of PriceClass_All, PriceClass_200, PriceClass_100. Defaults to PriceClass_100"
+  type        = string
+  default     = "PriceClass_100"
+}
+
+variable "cloudfront_geo_restriction_type" {
+  description = "The method that you want to use to restrict distribution of your content by country: none, whitelist, or blacklist. Defaults to none"
+  type        = string
+  default     = "none"
+}
+
+variable "cloudfront_geo_restriction_locations" {
+  description = "(Optional) - The ISO 3166-1-alpha-2 codes for which you want CloudFront either to distribute your content (whitelist) or not distribute your content (blacklist). Defaults to []"
+  type        = list(string)
+  default     = []
+}
+
+variable "cloudfront_website_retain_on_delete" {
+  description = "(Optional) - Disables the distribution instead of deleting it when destroying the resource through Terraform. If this is set, the distribution needs to be deleted manually afterwards. Defaults to false."
+  type        = bool
+  default     = false
+}
+
+variable "cloudfront_www_website_retain_on_delete" {
+  description = "(Optional) - Disables the distribution instead of deleting it when destroying the resource through Terraform. If this is set, the distribution needs to be deleted manually afterwards. Defaults to false."
+  type        = bool
+  default     = false
+}
+
+variable "cloudfront_website_wait_for_deployment" {
+  description = "(Optional) - If enabled, the resource will wait for the distribution status to change from InProgress to Deployed. Setting this tofalse will skip the process. Defaults to true."
+  type        = bool
+  default     = true
+}
+
+variable "cloudfront_www_website_wait_for_deployment" {
+  description = "(Optional) - If enabled, the resource will wait for the distribution status to change from InProgress to Deployed. Setting this tofalse will skip the process. Defaults to true."
+  type        = bool
+  default     = true
+}
