@@ -10,7 +10,10 @@ data "template_file" "website_bucket_policy" {
 
 # tfsec issues ignored (https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html)
 #  - AWS001: The contents of the bucket can be accessed publicly. Access should be allowed because it is hosting a website
-resource "aws_s3_bucket" "website" {
+#  - AWS017: The bucket objects could be read if compromised. TODO, implement this.
+resource "aws_s3_bucket" "website" { # tfsec:ignore:AWS017
+  provider = aws.main
+
   bucket        = local.website_bucket_name
   acl           = var.website_bucket_acl
   policy        = data.template_file.website_bucket_policy.rendered # tfsec:ignore:AWS001
@@ -45,13 +48,14 @@ resource "aws_s3_bucket" "website" {
   # TODO - Add replication configuration parameters
   # replication_configuration - (Optional) A configuration of replication configuration.
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "aws:kms"
-      }
-    }
-  }
+  # TODO - Review how to add server side encryption
+  # server_side_encryption_configuration {
+  #   rule {
+  #     apply_server_side_encryption_by_default {
+  #       sse_algorithm = "aws:kms"
+  #     }
+  #   }
+  # }
 
   # TODO - Add variables for S3 object locking
   # object_lock_configuration - (Optional) A configuration of S3 object locking
@@ -67,8 +71,9 @@ resource "aws_s3_bucket" "website" {
 #  - AWS075: Public buckets can be accessed by anyone. Should be disabled for bucket hosting a website
 #  - AWS076: Users could put a policy that allows public access. Should be disabled for bucket hosting a website
 resource "aws_s3_bucket_public_access_block" "website_bucket_public_access_block" {
-  bucket = aws_s3_bucket.website.id
+  provider = aws.main
 
+  bucket                  = aws_s3_bucket.website.id
   ignore_public_acls      = false # tfsec:ignore:AWS073
   block_public_acls       = false # tfsec:ignore:AWS074
   restrict_public_buckets = false # tfsec:ignore:AWS075
@@ -80,11 +85,12 @@ resource "aws_s3_bucket_public_access_block" "website_bucket_public_access_block
 #------------------------------------------------------------------------------
 # tfsec issues ignored
 #  - AWS045: Enable WAF for the CloudFront distribution. Pending to implement.
-#  - AWS021: Use the most modern TLS/SSL policies available. Cannot use latest because of default CF certificate
 resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
+  provider = aws.main
+
   count = var.enable_cloudfront ? 1 : 0
 
-  #   aliases = [local.website_bucket_name]
+  aliases = [local.website_bucket_name]
   comment = var.comment_for_cloudfront_website
 
   # TODO - Add variable for Custom Error Responses
@@ -117,11 +123,12 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
   origin {
     domain_name = aws_s3_bucket.website.website_endpoint
     origin_id   = "S3-.${local.website_bucket_name}"
+    # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https-cloudfront-to-s3-origin.html
     custom_origin_config {
-      http_port              = var.cloudfront_origin_http_port
-      https_port             = var.cloudfront_origin_https_port
-      origin_protocol_policy = var.cloudfront_origin_protocol_policy
-      origin_ssl_protocols   = var.cloudfront_origin_ssl_protocols
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
 
@@ -138,10 +145,11 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
     Name = "${var.name_prefix}-website"
   }, var.tags)
 
-  # TODO - Work on SSL certificates
-  # viewer_certificate (Required) - The SSL configuration for this distribution (maximum one).
-  viewer_certificate { # tfsec:ignore:AWS021
-    cloudfront_default_certificate = true
+  viewer_certificate {
+    acm_certificate_arn            = var.create_acm_certificate ? aws_acm_certificate_validation.cert_validation[0].certificate_arn : var.acm_certificate_arn_to_use
+    cloudfront_default_certificate = false
+    minimum_protocol_version       = "TLSv1.2_2021"
+    ssl_support_method             = "sni-only"
   }
 
   # TODO - Work to add Web ACL variables
@@ -156,6 +164,8 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
 # Cloudfront DNS Record (if CloudFront is enabled)
 #------------------------------------------------------------------------------
 resource "aws_route53_record" "website_cloudfront_record" {
+  provider = aws.main
+
   count = var.enable_cloudfront ? 1 : 0
 
   zone_id = aws_route53_zone.hosted_zone.zone_id
@@ -173,6 +183,8 @@ resource "aws_route53_record" "website_cloudfront_record" {
 # S3 DNS Record (if CloudFront is disabled)
 #------------------------------------------------------------------------------
 resource "aws_route53_record" "website_s3_record" {
+  provider = aws.main
+
   count = var.enable_cloudfront ? 0 : 1
 
   zone_id = aws_route53_zone.hosted_zone.zone_id

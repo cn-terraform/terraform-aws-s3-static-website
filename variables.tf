@@ -178,30 +178,6 @@ variable "cloudfront_http_version" {
   default     = "http2"
 }
 
-variable "cloudfront_origin_http_port" {
-  description = "The HTTP port the custom origin listens on. Defaults to 80"
-  type        = number
-  default     = 80
-}
-
-variable "cloudfront_origin_https_port" {
-  description = "The HTTPS port the custom origin listens on. Defaults to 443"
-  type        = number
-  default     = 443
-}
-
-variable "cloudfront_origin_protocol_policy" {
-  description = "The origin protocol policy to apply to your origin. One of http-only, https-only, or match-viewer."
-  type        = string
-  default     = "https-only"
-}
-
-variable "cloudfront_origin_ssl_protocols" {
-  description = "The SSL/TLS protocols that you want CloudFront to use when communicating with your origin over HTTPS. A list of one or more of SSLv3, TLSv1, TLSv1.1, and TLSv1.2. Defaults to TLSv1, TLSv1.1 and TLSv1.2"
-  type        = list(string)
-  default     = ["TLSv1", "TLSv1.1", "TLSv1.2"]
-}
-
 variable "cloudfront_price_class" {
   description = "(Optional) - The price class for this distribution. One of PriceClass_All, PriceClass_200, PriceClass_100. Defaults to PriceClass_100"
   type        = string
@@ -242,4 +218,19 @@ variable "cloudfront_www_website_wait_for_deployment" {
   description = "(Optional) - If enabled, the resource will wait for the distribution status to change from InProgress to Deployed. Setting this tofalse will skip the process. Defaults to true."
   type        = bool
   default     = true
+}
+
+#------------------------------------------------------------------------------
+# ACM Certificate
+#------------------------------------------------------------------------------
+variable "create_acm_certificate" {
+  description = "Enable or disable automatic ACM certificate creation. If set to false, the variable acm_certificate_arn_to_use is required. Defaults to true"
+  type        = bool
+  default     = true
+}
+
+variable "acm_certificate_arn_to_use" {
+  description = "ACM Certificate ARN to use in case you disable automatic certificate creation. Certificate must be in us-east-1 region."
+  type        = string
+  default     = ""
 }

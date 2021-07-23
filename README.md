@@ -35,12 +35,14 @@ In order to run all checks at any point run the following command:
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.50.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.50.0 |
+| <a name="provider_aws.acm_provider"></a> [aws.acm\_provider](#provider\_aws.acm\_provider) | 3.50.0 |
+| <a name="provider_aws.main"></a> [aws.main](#provider\_aws.main) | 3.50.0 |
 | <a name="provider_template"></a> [template](#provider\_template) | 2.2.0 |
 
 ## Modules
@@ -51,8 +53,11 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [aws_acm_certificate.cert](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate) | resource |
+| [aws_acm_certificate_validation.cert_validation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation) | resource |
 | [aws_cloudfront_distribution.website](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution) | resource |
 | [aws_cloudfront_distribution.www_website](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution) | resource |
+| [aws_route53_record.acm_certificate_validation_records](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_route53_record.website_cloudfront_record](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_route53_record.website_s3_record](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_route53_record.www_website_cloudfront_record](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
@@ -71,15 +76,12 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_acm_certificate_arn_to_use"></a> [acm\_certificate\_arn\_to\_use](#input\_acm\_certificate\_arn\_to\_use) | ACM Certificate ARN to use in case you disable automatic certificate creation. Certificate must be in us-east-1 region. | `string` | `""` | no |
 | <a name="input_cloudfront_allowed_cached_methods"></a> [cloudfront\_allowed\_cached\_methods](#input\_cloudfront\_allowed\_cached\_methods) | (Optional) Specifies which methods are allowed and cached by CloudFront. Can be GET, PUT, POST, DELETE or HEAD. Defaults to GET and HEAD | `list(string)` | <pre>[<br>  "GET",<br>  "HEAD"<br>]</pre> | no |
 | <a name="input_cloudfront_default_root_object"></a> [cloudfront\_default\_root\_object](#input\_cloudfront\_default\_root\_object) | (Optional) - The object that you want CloudFront to return (for example, index.html) when an end user requests the root URL. Defaults to index.html | `string` | `"index.html"` | no |
 | <a name="input_cloudfront_geo_restriction_locations"></a> [cloudfront\_geo\_restriction\_locations](#input\_cloudfront\_geo\_restriction\_locations) | (Optional) - The ISO 3166-1-alpha-2 codes for which you want CloudFront either to distribute your content (whitelist) or not distribute your content (blacklist). Defaults to [] | `list(string)` | `[]` | no |
 | <a name="input_cloudfront_geo_restriction_type"></a> [cloudfront\_geo\_restriction\_type](#input\_cloudfront\_geo\_restriction\_type) | The method that you want to use to restrict distribution of your content by country: none, whitelist, or blacklist. Defaults to none | `string` | `"none"` | no |
 | <a name="input_cloudfront_http_version"></a> [cloudfront\_http\_version](#input\_cloudfront\_http\_version) | (Optional) - The maximum HTTP version to support on the distribution. Allowed values are http1.1 and http2. The default is http2. | `string` | `"http2"` | no |
-| <a name="input_cloudfront_origin_http_port"></a> [cloudfront\_origin\_http\_port](#input\_cloudfront\_origin\_http\_port) | The HTTP port the custom origin listens on. Defaults to 80 | `number` | `80` | no |
-| <a name="input_cloudfront_origin_https_port"></a> [cloudfront\_origin\_https\_port](#input\_cloudfront\_origin\_https\_port) | The HTTPS port the custom origin listens on. Defaults to 443 | `number` | `443` | no |
-| <a name="input_cloudfront_origin_protocol_policy"></a> [cloudfront\_origin\_protocol\_policy](#input\_cloudfront\_origin\_protocol\_policy) | The origin protocol policy to apply to your origin. One of http-only, https-only, or match-viewer. | `string` | `"https-only"` | no |
-| <a name="input_cloudfront_origin_ssl_protocols"></a> [cloudfront\_origin\_ssl\_protocols](#input\_cloudfront\_origin\_ssl\_protocols) | The SSL/TLS protocols that you want CloudFront to use when communicating with your origin over HTTPS. A list of one or more of SSLv3, TLSv1, TLSv1.1, and TLSv1.2. Defaults to TLSv1, TLSv1.1 and TLSv1.2 | `list(string)` | <pre>[<br>  "TLSv1",<br>  "TLSv1.1",<br>  "TLSv1.2"<br>]</pre> | no |
 | <a name="input_cloudfront_price_class"></a> [cloudfront\_price\_class](#input\_cloudfront\_price\_class) | (Optional) - The price class for this distribution. One of PriceClass\_All, PriceClass\_200, PriceClass\_100. Defaults to PriceClass\_100 | `string` | `"PriceClass_100"` | no |
 | <a name="input_cloudfront_viewer_protocol_policy"></a> [cloudfront\_viewer\_protocol\_policy](#input\_cloudfront\_viewer\_protocol\_policy) | Use this element to specify the protocol that users can use to access the files in the origin specified by TargetOriginId when a request matches the path pattern in PathPattern. One of allow-all, https-only, or redirect-to-https. Defautls to redirect-to-https | `string` | `"redirect-to-https"` | no |
 | <a name="input_cloudfront_website_retain_on_delete"></a> [cloudfront\_website\_retain\_on\_delete](#input\_cloudfront\_website\_retain\_on\_delete) | (Optional) - Disables the distribution instead of deleting it when destroying the resource through Terraform. If this is set, the distribution needs to be deleted manually afterwards. Defaults to false. | `bool` | `false` | no |
@@ -88,6 +90,7 @@ No modules.
 | <a name="input_cloudfront_www_website_wait_for_deployment"></a> [cloudfront\_www\_website\_wait\_for\_deployment](#input\_cloudfront\_www\_website\_wait\_for\_deployment) | (Optional) - If enabled, the resource will wait for the distribution status to change from InProgress to Deployed. Setting this tofalse will skip the process. Defaults to true. | `bool` | `true` | no |
 | <a name="input_comment_for_cloudfront_website"></a> [comment\_for\_cloudfront\_website](#input\_comment\_for\_cloudfront\_website) | Comment for the Website CloudFront Distribution | `string` | `""` | no |
 | <a name="input_comment_for_cloudfront_www_website"></a> [comment\_for\_cloudfront\_www\_website](#input\_comment\_for\_cloudfront\_www\_website) | Comment for the WWW Website CloudFront Distribution | `string` | `""` | no |
+| <a name="input_create_acm_certificate"></a> [create\_acm\_certificate](#input\_create\_acm\_certificate) | Enable or disable automatic ACM certificate creation. If set to false, the variable acm\_certificate\_arn\_to\_use is required. Defaults to true | `bool` | `true` | no |
 | <a name="input_enable_cloudfront"></a> [enable\_cloudfront](#input\_enable\_cloudfront) | Indicates if Cloudfront should be created or not | `bool` | `true` | no |
 | <a name="input_is_ipv6_enabled"></a> [is\_ipv6\_enabled](#input\_is\_ipv6\_enabled) | (Optional) - Whether the IPv6 is enabled for the distribution. Defaults to true | `bool` | `true` | no |
 | <a name="input_log_bucket_versioning_enabled"></a> [log\_bucket\_versioning\_enabled](#input\_log\_bucket\_versioning\_enabled) | (Optional) Enable versioning. Once you version-enable a bucket, it can never return to an unversioned state. You can, however, suspend versioning on that bucket. Defaults to true | `bool` | `true` | no |
@@ -115,6 +118,15 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_acm_certificate_arn"></a> [acm\_certificate\_arn](#output\_acm\_certificate\_arn) | The ARN of the certificate |
+| <a name="output_acm_certificate_domain_name"></a> [acm\_certificate\_domain\_name](#output\_acm\_certificate\_domain\_name) | The domain name for which the certificate is issued |
+| <a name="output_acm_certificate_domain_validation_options"></a> [acm\_certificate\_domain\_validation\_options](#output\_acm\_certificate\_domain\_validation\_options) | Set of domain validation objects which can be used to complete certificate validation. Can have more than one element, e.g. if SANs are defined. |
+| <a name="output_acm_certificate_id"></a> [acm\_certificate\_id](#output\_acm\_certificate\_id) | The ARN of the certificate |
+| <a name="output_acm_certificate_status"></a> [acm\_certificate\_status](#output\_acm\_certificate\_status) | Status of the certificate. |
+| <a name="output_acm_certificate_tags_all"></a> [acm\_certificate\_tags\_all](#output\_acm\_certificate\_tags\_all) | A map of tags assigned to the resource, including those inherited from the provider default\_tags configuration block. |
+| <a name="output_cert_validation_certificate_arn"></a> [cert\_validation\_certificate\_arn](#output\_cert\_validation\_certificate\_arn) | The ARN of the certificate that is being validated. |
+| <a name="output_cert_validation_id"></a> [cert\_validation\_id](#output\_cert\_validation\_id) | The time at which the certificate was issued |
+| <a name="output_cert_validation_validation_record_fqdns"></a> [cert\_validation\_validation\_record\_fqdns](#output\_cert\_validation\_validation\_record\_fqdns) | List of FQDNs that implement the validation. |
 | <a name="output_cloudfront_website_arn"></a> [cloudfront\_website\_arn](#output\_cloudfront\_website\_arn) | The ARN (Amazon Resource Name) for the distribution. For example: arn:aws:cloudfront::123456789012:distribution/EDFDVBD632BHDS5, where 123456789012 is your AWS account ID. |
 | <a name="output_cloudfront_website_caller_reference"></a> [cloudfront\_website\_caller\_reference](#output\_cloudfront\_website\_caller\_reference) | Internal value used by CloudFront to allow future updates to the distribution configuration. |
 | <a name="output_cloudfront_website_domain_name"></a> [cloudfront\_website\_domain\_name](#output\_cloudfront\_website\_domain\_name) | The domain name corresponding to the distribution. For example: d604721fxaaqy9.cloudfront.net. |
