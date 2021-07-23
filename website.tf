@@ -188,8 +188,8 @@ resource "aws_route53_record" "www_website_record" {
   type    = "A"
 
   alias {
-    name                   = aws_route53_record.website_cloudfront_record.fqdn
-    zone_id                = aws_route53_record.website_cloudfront_record.zone_id
+    name                   = aws_cloudfront_distribution.website.domain_name
+    zone_id                = aws_cloudfront_distribution.website.hosted_zone_id
     evaluate_target_health = false
   }
 }
