@@ -254,7 +254,7 @@ variable "create_acm_certificate" {
 }
 
 variable "acm_certificate_arn_to_use" {
-  description = "ACM Certificate ARN to use in case you disable automatic certificate creation"
+  description = "ACM Certificate ARN to use in case you disable automatic certificate creation. Certificate must be in us-east-1 region"
   type        = string
   default     = ""
 }

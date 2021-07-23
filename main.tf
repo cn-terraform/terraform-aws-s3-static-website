@@ -53,9 +53,15 @@ resource "aws_route53_zone" "hosted_zone" {
 #------------------------------------------------------------------------------
 # ACM Certificate
 #------------------------------------------------------------------------------
+provider "aws" {
+  alias  = "acm_provider"
+  region = "us-east-1"
+}
+
 resource "aws_acm_certificate" "cert" {
   count = var.create_acm_certificate ? 1 : 0
 
+  provider                  = aws.acm_provider
   domain_name               = "*.${var.website_domain_name}"
   subject_alternative_names = [var.website_domain_name]
 
