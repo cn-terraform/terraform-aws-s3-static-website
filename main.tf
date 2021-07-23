@@ -48,6 +48,8 @@ resource "aws_s3_bucket" "log_bucket" {
 }
 
 data "aws_iam_policy_document" "log_bucket_access_polocy" {
+  provider = aws.main
+
   statement {
     sid = "Allow access to logs to certain accounts"
 
@@ -69,6 +71,8 @@ data "aws_iam_policy_document" "log_bucket_access_polocy" {
 }
 
 resource "aws_s3_bucket_policy" "log_bucket_access_polocy" {
+  provider = aws.main
+
   bucket = aws_s3_bucket.log_bucket.id
   policy = data.aws_iam_policy_document.log_bucket_access_polocy.json
 }
