@@ -122,13 +122,9 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
 
   origin {
     domain_name = aws_s3_bucket.website.website_endpoint
-    origin_id   = "S3-.${local.website_bucket_name}"
-    # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https-cloudfront-to-s3-origin.html
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "http-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
+    origin_id   = local.website_bucket_name
+    s3_origin_config {
+      origin_access_identity = "origin-access-identity/cloudfront/E2GU6TU0J2ZZ5C"
     }
   }
 
