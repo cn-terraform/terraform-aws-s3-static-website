@@ -85,11 +85,8 @@ data "aws_iam_policy_document" "log_bucket_access_policy" {
     ]
 
     principals {
-      type = "AWS"
-      identifiers = formatlist("arn:aws:iam::%s:root", concat(
-        [local.aws_account_id],
-        var.list_of_accounts_access_log_bucket),
-      )
+      type        = "AWS"
+      identifiers = formatlist("arn:aws:iam::%s:root", var.list_of_accounts_access_log_bucket)
     }
   }
 }
