@@ -128,6 +128,7 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
       http_port              = 80
       https_port             = 443
       origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = "TLSv1.2"
     }
   }
 
