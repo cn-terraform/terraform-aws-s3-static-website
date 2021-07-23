@@ -26,6 +26,12 @@ variable "log_bucket_versioning_mfa_delete" {
   default     = false
 }
 
+variable "aws_accounts_with_read_view_log_bucket" {
+  description = "List of AWS accounts with read permissions to log bucket"
+  type        = list(string)
+  default     = []
+}
+
 #------------------------------------------------------------------------------
 # Website
 #------------------------------------------------------------------------------
@@ -130,20 +136,8 @@ variable "www_website_versioning_mfa_delete" {
 #------------------------------------------------------------------------------
 # Cloudfront
 #------------------------------------------------------------------------------
-variable "enable_cloudfront" {
-  description = "Indicates if Cloudfront should be created or not"
-  type        = bool
-  default     = true
-}
-
 variable "comment_for_cloudfront_website" {
   description = "Comment for the Website CloudFront Distribution"
-  type        = string
-  default     = ""
-}
-
-variable "comment_for_cloudfront_www_website" {
-  description = "Comment for the WWW Website CloudFront Distribution"
   type        = string
   default     = ""
 }
@@ -202,19 +196,7 @@ variable "cloudfront_website_retain_on_delete" {
   default     = false
 }
 
-variable "cloudfront_www_website_retain_on_delete" {
-  description = "(Optional) - Disables the distribution instead of deleting it when destroying the resource through Terraform. If this is set, the distribution needs to be deleted manually afterwards. Defaults to false."
-  type        = bool
-  default     = false
-}
-
 variable "cloudfront_website_wait_for_deployment" {
-  description = "(Optional) - If enabled, the resource will wait for the distribution status to change from InProgress to Deployed. Setting this tofalse will skip the process. Defaults to true."
-  type        = bool
-  default     = true
-}
-
-variable "cloudfront_www_website_wait_for_deployment" {
   description = "(Optional) - If enabled, the resource will wait for the distribution status to change from InProgress to Deployed. Setting this tofalse will skip the process. Defaults to true."
   type        = bool
   default     = true

@@ -1,10 +1,20 @@
 #------------------------------------------------------------------------------
+# CloudFront Origin Access Identity
+#------------------------------------------------------------------------------
+resource "aws_cloudfront_origin_access_identity" "cf_oai" {
+  provider = aws.main
+
+  comment = "OAI to restrict access to AWS S3 content"
+}
+
+#------------------------------------------------------------------------------
 # Website S3 Bucket
 #------------------------------------------------------------------------------
 data "template_file" "website_bucket_policy" {
   template = file("${path.module}/templates/s3_website_bucket_policy.json")
   vars = {
     bucket_name = local.website_bucket_name
+    cf_oai_arn  = aws_cloudfront_origin_access_identity.cf_oai.iam_arn
   }
 }
 
@@ -65,19 +75,14 @@ resource "aws_s3_bucket" "website" { # tfsec:ignore:AWS017
   }, var.tags)
 }
 
-# tfsec issues ignored (https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html)
-#  - AWS073: PUT calls with public ACLs specified can make objects public. Should be disabled for bucket hosting a website
-#  - AWS074: PUT calls with public ACLs specified can make objects public. Should be disabled for bucket hosting a website
-#  - AWS075: Public buckets can be accessed by anyone. Should be disabled for bucket hosting a website
-#  - AWS076: Users could put a policy that allows public access. Should be disabled for bucket hosting a website
 resource "aws_s3_bucket_public_access_block" "website_bucket_public_access_block" {
   provider = aws.main
 
   bucket                  = aws_s3_bucket.website.id
-  ignore_public_acls      = false # tfsec:ignore:AWS073
-  block_public_acls       = false # tfsec:ignore:AWS074
-  restrict_public_buckets = false # tfsec:ignore:AWS075
-  block_public_policy     = false # tfsec:ignore:AWS076
+  ignore_public_acls      = true
+  block_public_acls       = true
+  restrict_public_buckets = true
+  block_public_policy     = true
 }
 
 #------------------------------------------------------------------------------
@@ -88,9 +93,11 @@ resource "aws_s3_bucket_public_access_block" "website_bucket_public_access_block
 resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
   provider = aws.main
 
-  count = var.enable_cloudfront ? 1 : 0
+  aliases = [
+    local.website_bucket_name,
+    local.www_website_bucket_name
+  ]
 
-  aliases = [local.website_bucket_name]
   comment = var.comment_for_cloudfront_website
 
   # TODO - Add variable for Custom Error Responses
@@ -102,7 +109,7 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
     origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # Managed-CORS-S3Origin
     allowed_methods          = var.cloudfront_allowed_cached_methods
     cached_methods           = var.cloudfront_allowed_cached_methods
-    target_origin_id         = "S3-.${local.website_bucket_name}"
+    target_origin_id         = local.website_bucket_name
     viewer_protocol_policy   = var.cloudfront_viewer_protocol_policy
   }
 
@@ -121,14 +128,10 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
   # ordered_cache_behavior (Optional) - An ordered list of cache behaviors resource for this distribution. List from top to bottom in order of precedence. The topmost cache behavior will have precedence 0.
 
   origin {
-    domain_name = aws_s3_bucket.website.website_endpoint
-    origin_id   = "S3-.${local.website_bucket_name}"
-    # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https-cloudfront-to-s3-origin.html
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "http-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
+    domain_name = aws_s3_bucket.website.bucket_regional_domain_name
+    origin_id   = local.website_bucket_name
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.cf_oai.cloudfront_access_identity_path
     }
   }
 
@@ -166,34 +169,27 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
 resource "aws_route53_record" "website_cloudfront_record" {
   provider = aws.main
 
-  count = var.enable_cloudfront ? 1 : 0
-
   zone_id = aws_route53_zone.hosted_zone.zone_id
   name    = local.website_bucket_name
   type    = "A"
 
   alias {
-    name                   = aws_cloudfront_distribution.website[0].domain_name
-    zone_id                = aws_cloudfront_distribution.website[0].hosted_zone_id
+    name                   = aws_cloudfront_distribution.website.domain_name
+    zone_id                = aws_cloudfront_distribution.website.hosted_zone_id
     evaluate_target_health = false
   }
 }
 
-#------------------------------------------------------------------------------
-# S3 DNS Record (if CloudFront is disabled)
-#------------------------------------------------------------------------------
-resource "aws_route53_record" "website_s3_record" {
+resource "aws_route53_record" "www_website_record" {
   provider = aws.main
 
-  count = var.enable_cloudfront ? 0 : 1
-
   zone_id = aws_route53_zone.hosted_zone.zone_id
-  name    = local.website_bucket_name
+  name    = local.www_website_bucket_name
   type    = "A"
 
   alias {
-    name                   = aws_s3_bucket.website.website_domain
-    zone_id                = aws_s3_bucket.website.hosted_zone_id
+    name                   = aws_cloudfront_distribution.website.domain_name
+    zone_id                = aws_cloudfront_distribution.website.hosted_zone_id
     evaluate_target_health = false
   }
 }

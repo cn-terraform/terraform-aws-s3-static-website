@@ -12,7 +12,6 @@ terraform {
   }
 }
 
-
 #------------------------------------------------------------------------------
 # Locals
 #------------------------------------------------------------------------------
@@ -24,7 +23,9 @@ locals {
 #------------------------------------------------------------------------------
 # S3 Bucket for logs
 #------------------------------------------------------------------------------
-resource "aws_s3_bucket" "log_bucket" {
+# tfsec issues ignored
+#  - AWS017: The bucket objects could be read if compromised
+resource "aws_s3_bucket" "log_bucket" { # tfsec:ignore:AWS017
   provider = aws.main
 
   bucket = "${var.name_prefix}-log-bucket"
@@ -35,17 +36,39 @@ resource "aws_s3_bucket" "log_bucket" {
     mfa_delete = var.log_bucket_versioning_mfa_delete
   }
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "aws:kms"
-      }
-    }
-  }
-
   tags = merge({
     Name = "${var.name_prefix}-logs"
   }, var.tags)
+}
+
+data "aws_iam_policy_document" "log_bucket_access_policy" {
+  provider = aws.main
+
+  statement {
+    sid = "Allow access to logs bucket to current account"
+
+    actions = [
+      "s3:List*",
+      "s3:Get*",
+    ]
+
+    resources = [
+      aws_s3_bucket.log_bucket.arn,
+      "${aws_s3_bucket.log_bucket.arn}/*",
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = formatlist("arn:aws:iam::%s:root", var.aws_accounts_with_read_view_log_bucket)
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "log_bucket_access_policy" {
+  provider = aws.main
+
+  bucket = aws_s3_bucket.log_bucket.id
+  policy = data.aws_iam_policy_document.log_bucket_access_policy.json
 }
 
 resource "aws_s3_bucket_public_access_block" "log_bucket_public_access_block" {
@@ -119,3 +142,5 @@ resource "aws_acm_certificate_validation" "cert_validation" {
   certificate_arn         = aws_acm_certificate.cert[0].arn
   validation_record_fqdns = [for record in aws_route53_record.acm_certificate_validation_records : record.fqdn]
 }
+
+
