@@ -68,7 +68,7 @@ resource "aws_acm_certificate" "cert" {
   validation_method = "DNS"
 
   tags = merge({
-    Name = "*.${var.website_domain_name}"
+    Name = var.website_domain_name
   }, var.tags)
 
   lifecycle {
