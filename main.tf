@@ -1,4 +1,19 @@
 #------------------------------------------------------------------------------
+# Terraform Required Providers
+#------------------------------------------------------------------------------
+terraform {
+  required_version = ">= 0.13"
+  required_providers {
+    aws = {
+      source                = "hashicorp/aws"
+      version               = ">= 3.50.0"
+      configuration_aliases = [aws.main, aws.acm_provider]
+    }
+  }
+}
+
+
+#------------------------------------------------------------------------------
 # Locals
 #------------------------------------------------------------------------------
 locals {
@@ -10,6 +25,8 @@ locals {
 # S3 Bucket for logs
 #------------------------------------------------------------------------------
 resource "aws_s3_bucket" "log_bucket" {
+  provider = aws.main
+
   bucket = "${var.name_prefix}-log-bucket"
   acl    = "log-delivery-write"
 
@@ -32,8 +49,9 @@ resource "aws_s3_bucket" "log_bucket" {
 }
 
 resource "aws_s3_bucket_public_access_block" "log_bucket_public_access_block" {
-  bucket = aws_s3_bucket.log_bucket.id
+  provider = aws.main
 
+  bucket                  = aws_s3_bucket.log_bucket.id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -44,6 +62,8 @@ resource "aws_s3_bucket_public_access_block" "log_bucket_public_access_block" {
 # Route53 Hosted Zone
 #------------------------------------------------------------------------------
 resource "aws_route53_zone" "hosted_zone" {
+  provider = aws.main
+
   name = var.website_domain_name
   tags = merge({
     Name = "${var.name_prefix}-hosted-zone"
@@ -53,15 +73,11 @@ resource "aws_route53_zone" "hosted_zone" {
 #------------------------------------------------------------------------------
 # ACM Certificate
 #------------------------------------------------------------------------------
-provider "aws" {
-  alias  = "acm_provider"
-  region = "us-east-1"
-}
-
 resource "aws_acm_certificate" "cert" {
+  provider = aws.acm_provider
+
   count = var.create_acm_certificate ? 1 : 0
 
-  provider                  = aws.acm_provider
   domain_name               = "*.${var.website_domain_name}"
   subject_alternative_names = [var.website_domain_name]
 
@@ -77,6 +93,8 @@ resource "aws_acm_certificate" "cert" {
 }
 
 resource "aws_route53_record" "acm_certificate_validation_records" {
+  provider = aws.main
+
   for_each = {
     for dvo in aws_acm_certificate.cert[0].domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
@@ -94,9 +112,10 @@ resource "aws_route53_record" "acm_certificate_validation_records" {
 }
 
 resource "aws_acm_certificate_validation" "cert_validation" {
+  provider = aws.acm_provider
+
   count = var.create_acm_certificate ? 1 : 0
 
-  provider                = aws.acm_provider
   certificate_arn         = aws_acm_certificate.cert[0].arn
   validation_record_fqdns = [for record in aws_route53_record.acm_certificate_validation_records : record.fqdn]
 }

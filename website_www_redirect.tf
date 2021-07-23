@@ -11,6 +11,8 @@ data "template_file" "www_website_bucket_policy" {
 # tfsec issues ignored (https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html)
 #  - AWS001: The contents of the bucket can be accessed publicly. Access should be allowed because it is hosting a website
 resource "aws_s3_bucket" "www_website" {
+  provider = aws.main
+
   bucket        = local.www_website_bucket_name
   acl           = var.www_website_bucket_acl
   policy        = data.template_file.www_website_bucket_policy.rendered # tfsec:ignore:AWS001
@@ -49,8 +51,9 @@ resource "aws_s3_bucket" "www_website" {
 #  - AWS075: Public buckets can be accessed by anyone. Should be disabled for bucket hosting a website
 #  - AWS076: Users could put a policy that allows public access. Should be disabled for bucket hosting a website
 resource "aws_s3_bucket_public_access_block" "www_website_bucket_public_access_block" {
-  bucket = aws_s3_bucket.www_website.id
+  provider = aws.main
 
+  bucket                  = aws_s3_bucket.www_website.id
   ignore_public_acls      = false # tfsec:ignore:AWS073
   block_public_acls       = false # tfsec:ignore:AWS074
   restrict_public_buckets = false # tfsec:ignore:AWS075
@@ -64,6 +67,8 @@ resource "aws_s3_bucket_public_access_block" "www_website_bucket_public_access_b
 #  - AWS045: Enable WAF for the CloudFront distribution. Pending to implement.
 #  - AWS021: Use the most modern TLS/SSL policies available. Cannot use latest because of default CF certificate
 resource "aws_cloudfront_distribution" "www_website" { # tfsec:ignore:AWS045
+  provider = aws.main
+
   count = var.enable_cloudfront ? 1 : 0
 
   aliases = [local.www_website_bucket_name]
@@ -138,6 +143,8 @@ resource "aws_cloudfront_distribution" "www_website" { # tfsec:ignore:AWS045
 # Cloudfront DNS Record (if CloudFront is enabled)
 #------------------------------------------------------------------------------
 resource "aws_route53_record" "www_website_cloudfront_record" {
+  provider = aws.main
+
   count = var.enable_cloudfront ? 1 : 0
 
   zone_id = aws_route53_zone.hosted_zone.zone_id
@@ -155,6 +162,8 @@ resource "aws_route53_record" "www_website_cloudfront_record" {
 # S3 DNS Record (if CloudFront is disabled)
 #------------------------------------------------------------------------------
 resource "aws_route53_record" "www_website_s3_record" {
+  provider = aws.main
+
   count = var.enable_cloudfront ? 0 : 1
 
   zone_id = aws_route53_zone.hosted_zone.zone_id
