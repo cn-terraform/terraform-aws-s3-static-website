@@ -15,7 +15,12 @@ terraform {
 #------------------------------------------------------------------------------
 # Locals
 #------------------------------------------------------------------------------
+data "aws_caller_identity" "current" {
+  provider = aws.main
+}
+
 locals {
+  aws_account_id          = data.aws_caller_identity.current.account_id
   website_bucket_name     = var.website_domain_name
   www_website_bucket_name = "www.${var.website_domain_name}"
 }
@@ -45,6 +50,32 @@ resource "aws_s3_bucket" "log_bucket" {
   tags = merge({
     Name = "${var.name_prefix}-logs"
   }, var.tags)
+}
+
+data "aws_iam_policy_document" "log_bucket_access_polocy" {
+  statement {
+    sid = "Allow access to logs to certain accounts"
+
+    actions = [
+      "s3:List*",
+      "s3:Get*",
+    ]
+
+    resources = [
+      aws_s3_bucket.log_bucket.arn,
+      "${aws_s3_bucket.log_bucket.arn}/*",
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = [local.aws_account_id]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "log_bucket_access_polocy" {
+  bucket = aws_s3_bucket.log_bucket.id
+  policy = data.aws_iam_policy_document.log_bucket_access_polocy.json
 }
 
 resource "aws_s3_bucket_public_access_block" "log_bucket_public_access_block" {
