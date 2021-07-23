@@ -15,7 +15,12 @@ terraform {
 #------------------------------------------------------------------------------
 # Locals
 #------------------------------------------------------------------------------
+data "aws_caller_identity" "current" {
+  provider = aws.main
+}
+
 locals {
+  aws_account_id          = data.aws_caller_identity.current.account_id
   website_bucket_name     = var.website_domain_name
   www_website_bucket_name = "www.${var.website_domain_name}"
 }
@@ -47,8 +52,24 @@ resource "aws_s3_bucket" "log_bucket" {
   }, var.tags)
 }
 
-data "aws_iam_policy_document" "log_bucket_access_polocy" {
+data "aws_iam_policy_document" "log_bucket_access_policy" {
   provider = aws.main
+
+  statement {
+    sid = "Allow access to logs bucket to current account"
+
+    actions = ["s3:*"]
+
+    resources = [
+      aws_s3_bucket.log_bucket.arn,
+      "${aws_s3_bucket.log_bucket.arn}/*",
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = [local.aws_account_id]
+    }
+  }
 
   statement {
     sid = "Allow access to logs to certain accounts"
@@ -64,17 +85,20 @@ data "aws_iam_policy_document" "log_bucket_access_polocy" {
     ]
 
     principals {
-      type        = "AWS"
-      identifiers = formatlist("arn:aws:iam::%s:root", var.list_of_accounts_access_log_bucket)
+      type = "AWS"
+      identifiers = formatlist("arn:aws:iam::%s:root", concat(
+        [local.aws_account_id],
+        var.list_of_accounts_access_log_bucket),
+      )
     }
   }
 }
 
-resource "aws_s3_bucket_policy" "log_bucket_access_polocy" {
+resource "aws_s3_bucket_policy" "log_bucket_access_policy" {
   provider = aws.main
 
   bucket = aws_s3_bucket.log_bucket.id
-  policy = data.aws_iam_policy_document.log_bucket_access_polocy.json
+  policy = data.aws_iam_policy_document.log_bucket_access_policy.json
 }
 
 resource "aws_s3_bucket_public_access_block" "log_bucket_public_access_block" {
