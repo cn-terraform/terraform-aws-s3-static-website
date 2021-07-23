@@ -119,3 +119,8 @@ resource "aws_acm_certificate_validation" "cert_validation" {
   certificate_arn         = aws_acm_certificate.cert[0].arn
   validation_record_fqdns = [for record in aws_route53_record.acm_certificate_validation_records : record.fqdn]
 }
+
+#------------------------------------------------------------------------------
+# CloudFront Origin Access Identity
+#------------------------------------------------------------------------------
+# cf_oai_arn

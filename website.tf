@@ -66,19 +66,14 @@ resource "aws_s3_bucket" "website" { # tfsec:ignore:AWS017
   }, var.tags)
 }
 
-# tfsec issues ignored (https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html)
-#  - AWS073: PUT calls with public ACLs specified can make objects public. Should be disabled for bucket hosting a website
-#  - AWS074: PUT calls with public ACLs specified can make objects public. Should be disabled for bucket hosting a website
-#  - AWS075: Public buckets can be accessed by anyone. Should be disabled for bucket hosting a website
-#  - AWS076: Users could put a policy that allows public access. Should be disabled for bucket hosting a website
 resource "aws_s3_bucket_public_access_block" "website_bucket_public_access_block" {
   provider = aws.main
 
   bucket                  = aws_s3_bucket.website.id
-  ignore_public_acls      = false # tfsec:ignore:AWS073
-  block_public_acls       = false # tfsec:ignore:AWS074
-  restrict_public_buckets = false # tfsec:ignore:AWS075
-  block_public_policy     = false # tfsec:ignore:AWS076
+  ignore_public_acls      = true
+  block_public_acls       = true
+  restrict_public_buckets = true
+  block_public_policy     = true
 }
 
 #------------------------------------------------------------------------------
@@ -89,9 +84,11 @@ resource "aws_s3_bucket_public_access_block" "website_bucket_public_access_block
 resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
   provider = aws.main
 
-  count = var.enable_cloudfront ? 1 : 0
+  aliases = [
+    local.website_bucket_name,
+    local.www_website_bucket_name
+  ]
 
-  aliases = [local.website_bucket_name]
   comment = var.comment_for_cloudfront_website
 
   # TODO - Add variable for Custom Error Responses
@@ -163,34 +160,27 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
 resource "aws_route53_record" "website_cloudfront_record" {
   provider = aws.main
 
-  count = var.enable_cloudfront ? 1 : 0
-
   zone_id = aws_route53_zone.hosted_zone.zone_id
   name    = local.website_bucket_name
   type    = "A"
 
   alias {
-    name                   = aws_cloudfront_distribution.website[0].domain_name
-    zone_id                = aws_cloudfront_distribution.website[0].hosted_zone_id
+    name                   = aws_cloudfront_distribution.website.domain_name
+    zone_id                = aws_cloudfront_distribution.website.hosted_zone_id
     evaluate_target_health = false
   }
 }
 
-#------------------------------------------------------------------------------
-# S3 DNS Record (if CloudFront is disabled)
-#------------------------------------------------------------------------------
-resource "aws_route53_record" "website_s3_record" {
+resource "aws_route53_record" "www_website_cloudfront_record" {
   provider = aws.main
 
-  count = var.enable_cloudfront ? 0 : 1
-
   zone_id = aws_route53_zone.hosted_zone.zone_id
-  name    = local.website_bucket_name
+  name    = local.www_website_bucket_name
   type    = "A"
 
   alias {
-    name                   = aws_s3_bucket.website.website_domain
-    zone_id                = aws_s3_bucket.website.hosted_zone_id
+    name                   = aws_cloudfront_distribution.website.domain_name
+    zone_id                = aws_cloudfront_distribution.website.hosted_zone_id
     evaluate_target_health = false
   }
 }

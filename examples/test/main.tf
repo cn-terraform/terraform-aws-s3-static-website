@@ -8,6 +8,5 @@ module "test_website" {
   }
 
   website_domain_name    = "test.com"
-  enable_cloudfront      = true
   create_acm_certificate = true
 }
