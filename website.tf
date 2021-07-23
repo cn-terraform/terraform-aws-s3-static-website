@@ -171,7 +171,7 @@ resource "aws_route53_record" "website_cloudfront_record" {
   }
 }
 
-resource "aws_route53_record" "www_website_cloudfront_record" {
+resource "aws_route53_record" "www_website_record" {
   provider = aws.main
 
   zone_id = aws_route53_zone.hosted_zone.zone_id
@@ -179,8 +179,8 @@ resource "aws_route53_record" "www_website_cloudfront_record" {
   type    = "A"
 
   alias {
-    name                   = aws_cloudfront_distribution.website.domain_name
-    zone_id                = aws_cloudfront_distribution.website.hosted_zone_id
+    name                   = aws_route53_record.website_cloudfront_record.fqdn
+    zone_id                = aws_route53_record.website_cloudfront_record.zone_id
     evaluate_target_health = false
   }
 }
