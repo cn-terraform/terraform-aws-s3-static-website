@@ -243,3 +243,18 @@ variable "cloudfront_www_website_wait_for_deployment" {
   type        = bool
   default     = true
 }
+
+#------------------------------------------------------------------------------
+# ACM Certificate
+#------------------------------------------------------------------------------
+variable "create_acm_certificate" {
+  description = "Enable or disable automatic ACM certificate creation. If set to false, the variable acm_certificate_arn_to_use is required. Defaults to true"
+  type        = bool
+  default     = true
+}
+
+variable "acm_certificate_arn_to_use" {
+  description = "ACM Certificate ARN to use in case you disable automatic certificate creation"
+  type        = string
+  default     = ""
+}

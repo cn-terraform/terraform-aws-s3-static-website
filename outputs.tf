@@ -257,3 +257,36 @@ output "route_53_record_www_website_fqdn" {
   description = "FQDN built using the zone domain and name."
   value       = var.enable_cloudfront ? aws_route53_record.www_website_cloudfront_record[0].fqdn : aws_route53_record.www_website_s3_record[0].fqdn
 }
+
+#------------------------------------------------------------------------------
+# ACM Certificate
+#------------------------------------------------------------------------------
+output "acm_certificate_id" {
+  description = "The ARN of the certificate"
+  value       = var.create_acm_certificate ? aws_acm_certificate.cert[0].id : var.acm_certificate_arn_to_use
+}
+
+output "acm_certificate_arn" {
+  description = "The ARN of the certificate"
+  value       = var.create_acm_certificate ? aws_acm_certificate.cert[0].arn : var.acm_certificate_arn_to_use
+}
+
+output "acm_certificate_domain_name" {
+  description = "The domain name for which the certificate is issued"
+  value       = var.create_acm_certificate ? aws_acm_certificate.cert[0].domain_name : ""
+}
+
+output "acm_certificate_domain_validation_options" {
+  description = "Set of domain validation objects which can be used to complete certificate validation. Can have more than one element, e.g. if SANs are defined."
+  value       = var.create_acm_certificate ? aws_acm_certificate.cert[0].domain_validation_options : ""
+}
+
+output "acm_certificate_status" {
+  description = "Status of the certificate."
+  value       = var.create_acm_certificate ? aws_acm_certificate.cert[0].status : ""
+}
+
+output "acm_certificate_tags_all" {
+  description = "A map of tags assigned to the resource, including those inherited from the provider default_tags configuration block."
+  value       = var.create_acm_certificate ? aws_acm_certificate.cert[0].tags_all : {}
+}
