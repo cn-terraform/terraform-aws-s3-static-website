@@ -126,6 +126,7 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
     # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https-cloudfront-to-s3-origin.html
     custom_origin_config {
       http_port              = 80
+      https_port             = 443
       origin_protocol_policy = "http-only"
     }
   }
