@@ -26,6 +26,12 @@ variable "log_bucket_versioning_mfa_delete" {
   default     = false
 }
 
+variable "aws_accounts_with_read_view_log_bucket" {
+  description = "List of AWS accounts with read permissions to log bucket"
+  type        = list(string)
+  default     = []
+}
+
 #------------------------------------------------------------------------------
 # Website
 #------------------------------------------------------------------------------

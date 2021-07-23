@@ -15,12 +15,7 @@ terraform {
 #------------------------------------------------------------------------------
 # Locals
 #------------------------------------------------------------------------------
-data "aws_caller_identity" "current" {
-  provider = aws.main
-}
-
 locals {
-  aws_account_id          = data.aws_caller_identity.current.account_id
   website_bucket_name     = var.website_domain_name
   www_website_bucket_name = "www.${var.website_domain_name}"
 }
@@ -64,7 +59,7 @@ data "aws_iam_policy_document" "log_bucket_access_policy" {
 
     principals {
       type        = "AWS"
-      identifiers = formatlist("arn:aws:iam::%s:root", [local.aws_account_id])
+      identifiers = formatlist("arn:aws:iam::%s:root", [var.aws_accounts_with_read_view_log_bucket])
     }
   }
 }
