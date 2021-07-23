@@ -66,7 +66,7 @@ resource "aws_s3_bucket_public_access_block" "www_website_bucket_public_access_b
 resource "aws_cloudfront_distribution" "www_website" { # tfsec:ignore:AWS045
   count = var.enable_cloudfront ? 1 : 0
 
-  # aliases = [local.www_website_bucket_name]
+  aliases = [local.www_website_bucket_name]
   comment = var.comment_for_cloudfront_www_website
 
   # TODO - Add variable for Custom Error Responses
@@ -119,10 +119,11 @@ resource "aws_cloudfront_distribution" "www_website" { # tfsec:ignore:AWS045
     Name = "${var.name_prefix}-www-website"
   }, var.tags)
 
-  # TODO - Work on SSL certificates
-  # viewer_certificate (Required) - The SSL configuration for this distribution (maximum one).
-  viewer_certificate { # tfsec:ignore:AWS021
-    cloudfront_default_certificate = true
+  viewer_certificate {
+    acm_certificate_arn            = var.create_acm_certificate ? aws_acm_certificate_validation.cert_validation[0].certificate_arn : var.acm_certificate_arn_to_use
+    cloudfront_default_certificate = false
+    minimum_protocol_version       = "TLSv1.2_2021"
+    ssl_support_method             = "sni-only"
   }
 
   # TODO - Work to add Web ACL variables
