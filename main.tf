@@ -70,25 +70,6 @@ data "aws_iam_policy_document" "log_bucket_access_policy" {
       identifiers = formatlist("arn:aws:iam::%s:root", [local.aws_account_id])
     }
   }
-
-  statement {
-    sid = "Allow read access to logs to certain accounts"
-
-    actions = [
-      "s3:List*",
-      "s3:Get*",
-    ]
-
-    resources = [
-      aws_s3_bucket.log_bucket.arn,
-      "${aws_s3_bucket.log_bucket.arn}/*",
-    ]
-
-    principals {
-      type        = "AWS"
-      identifiers = formatlist("arn:aws:iam::%s:root", var.list_of_accounts_access_log_bucket)
-    }
-  }
 }
 
 resource "aws_s3_bucket_policy" "log_bucket_access_policy" {
