@@ -278,7 +278,7 @@ output "acm_certificate_domain_name" {
 
 output "acm_certificate_domain_validation_options" {
   description = "Set of domain validation objects which can be used to complete certificate validation. Can have more than one element, e.g. if SANs are defined."
-  value       = var.create_acm_certificate ? aws_acm_certificate.cert[0].domain_validation_options : ""
+  value       = var.create_acm_certificate ? aws_acm_certificate.cert[0].domain_validation_options : []
 }
 
 output "acm_certificate_status" {
