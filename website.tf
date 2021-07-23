@@ -1,11 +1,18 @@
 #------------------------------------------------------------------------------
+# CloudFront Origin Access Identity
+#------------------------------------------------------------------------------
+resource "aws_cloudfront_origin_access_identity" "cf_oai" {
+  comment = "OAI to restrict access to AWS S3 content"
+}
+
+#------------------------------------------------------------------------------
 # Website S3 Bucket
 #------------------------------------------------------------------------------
 data "template_file" "website_bucket_policy" {
   template = file("${path.module}/templates/s3_website_bucket_policy.json")
   vars = {
     bucket_name = local.website_bucket_name
-    cf_oai_arn  = "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity E2GU6TU0J2ZZ5C"
+    cf_oai_arn  = aws_cloudfront_origin_access_identity.cf_oai.iam_arn
   }
 }
 
@@ -122,7 +129,7 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
     domain_name = aws_s3_bucket.website.bucket_regional_domain_name
     origin_id   = local.website_bucket_name
     s3_origin_config {
-      origin_access_identity = "origin-access-identity/cloudfront/E2GU6TU0J2ZZ5C"
+      origin_access_identity = aws_cloudfront_origin_access_identity.cf_oai.cloudfront_access_identity_path
     }
   }
 
