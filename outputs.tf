@@ -139,12 +139,12 @@ output "route_53_record_website_fqdn" {
 
 output "route_53_record_www_website_name" {
   description = "The name of the record."
-  value       = aws_route53_record.www_website_cloudfront_record.name
+  value       = aws_route53_record.www_website_record.name
 }
 
 output "route_53_record_www_website_fqdn" {
   description = "FQDN built using the zone domain and name."
-  value       = aws_route53_record.www_website_cloudfront_record.fqdn
+  value       = aws_route53_record.www_website_record.fqdn
 }
 
 #------------------------------------------------------------------------------
