@@ -290,3 +290,18 @@ output "acm_certificate_tags_all" {
   description = "A map of tags assigned to the resource, including those inherited from the provider default_tags configuration block."
   value       = var.create_acm_certificate ? aws_acm_certificate.cert[0].tags_all : {}
 }
+
+output "cert_validation_certificate_arn" {
+  description = "The ARN of the certificate that is being validated."
+  value       = var.create_acm_certificate ? aws_acm_certificate_validation.cert_validation[0].certificate_arn : ""
+}
+
+output "cert_validation_validation_record_fqdns" {
+  description = "List of FQDNs that implement the validation."
+  value       = var.create_acm_certificate ? aws_acm_certificate_validation.cert_validation[0].validation_record_fqdns : []
+}
+
+output "cert_validation_id" {
+  description = "The time at which the certificate was issued"
+  value       = var.create_acm_certificate ? aws_acm_certificate_validation.cert_validation[0].id : ""
+}
