@@ -9,4 +9,6 @@ module "test_website" {
 
   website_domain_name    = "test.com"
   create_acm_certificate = true
+
+  aws_accounts_with_read_view_log_bucket = ["mock_account"]
 }
