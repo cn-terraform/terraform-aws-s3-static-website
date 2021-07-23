@@ -140,10 +140,8 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
 
   # TODO - Work on SSL certificates
   # viewer_certificate (Required) - The SSL configuration for this distribution (maximum one).
-  viewer_certificate {
+  viewer_certificate { # tfsec:ignore:AWS021
     cloudfront_default_certificate = true
-    # ssl_support_method             = var.cloudfront_viewer_certificate_ssl_support_method
-    # minimum_protocol_version       = var.cloudfront_viewer_certificate_minimum_protocol_version # tfsec:ignore:AWS021
   }
 
   # TODO - Work to add Web ACL variables
