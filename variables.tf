@@ -178,30 +178,6 @@ variable "cloudfront_http_version" {
   default     = "http2"
 }
 
-variable "cloudfront_origin_http_port" {
-  description = "The HTTP port the custom origin listens on. Defaults to 80"
-  type        = number
-  default     = 80
-}
-
-variable "cloudfront_origin_https_port" {
-  description = "The HTTPS port the custom origin listens on. Defaults to 443"
-  type        = number
-  default     = 443
-}
-
-variable "cloudfront_origin_protocol_policy" {
-  description = "The origin protocol policy to apply to your origin. One of http-only, https-only, or match-viewer."
-  type        = string
-  default     = "https-only"
-}
-
-variable "cloudfront_origin_ssl_protocols" {
-  description = "The SSL/TLS protocols that you want CloudFront to use when communicating with your origin over HTTPS. A list of one or more of SSLv3, TLSv1, TLSv1.1, and TLSv1.2. Defaults to TLSv1, TLSv1.1 and TLSv1.2"
-  type        = list(string)
-  default     = ["TLSv1", "TLSv1.1", "TLSv1.2"]
-}
-
 variable "cloudfront_price_class" {
   description = "(Optional) - The price class for this distribution. One of PriceClass_All, PriceClass_200, PriceClass_100. Defaults to PriceClass_100"
   type        = string

@@ -10,7 +10,8 @@ data "template_file" "www_website_bucket_policy" {
 
 # tfsec issues ignored (https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html)
 #  - AWS001: The contents of the bucket can be accessed publicly. Access should be allowed because it is hosting a website
-resource "aws_s3_bucket" "www_website" {
+#  - AWS017: The bucket objects could be read if compromised. TODO, implement this.
+resource "aws_s3_bucket" "www_website" { # tfsec:ignore:AWS017
   provider = aws.main
 
   bucket        = local.www_website_bucket_name
@@ -32,13 +33,13 @@ resource "aws_s3_bucket" "www_website" {
     target_prefix = "www-website/"
   }
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "aws:kms"
-      }
-    }
-  }
+  # server_side_encryption_configuration {
+  #   rule {
+  #     apply_server_side_encryption_by_default {
+  #       sse_algorithm = "aws:kms"
+  #     }
+  #   }
+  # }
 
   tags = merge({
     Name = "${var.name_prefix}-www-website"
@@ -65,7 +66,6 @@ resource "aws_s3_bucket_public_access_block" "www_website_bucket_public_access_b
 #------------------------------------------------------------------------------
 # tfsec issues ignored
 #  - AWS045: Enable WAF for the CloudFront distribution. Pending to implement.
-#  - AWS021: Use the most modern TLS/SSL policies available. Cannot use latest because of default CF certificate
 resource "aws_cloudfront_distribution" "www_website" { # tfsec:ignore:AWS045
   provider = aws.main
 
@@ -103,11 +103,10 @@ resource "aws_cloudfront_distribution" "www_website" { # tfsec:ignore:AWS045
   origin {
     domain_name = aws_s3_bucket.www_website.website_endpoint
     origin_id   = "S3-${local.www_website_bucket_name}"
+    # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https-cloudfront-to-s3-origin.html
     custom_origin_config {
-      http_port              = var.cloudfront_origin_http_port
-      https_port             = var.cloudfront_origin_https_port
-      origin_protocol_policy = var.cloudfront_origin_protocol_policy
-      origin_ssl_protocols   = var.cloudfront_origin_ssl_protocols
+      http_port              = 80
+      origin_protocol_policy = "http-only"
     }
   }
 
