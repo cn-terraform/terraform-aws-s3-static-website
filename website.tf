@@ -122,7 +122,7 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
   # ordered_cache_behavior (Optional) - An ordered list of cache behaviors resource for this distribution. List from top to bottom in order of precedence. The topmost cache behavior will have precedence 0.
 
   origin {
-    domain_name = aws_s3_bucket.website.website_endpoint
+    domain_name = aws_s3_bucket.website.bucket_regional_domain_name
     origin_id   = local.website_bucket_name
     s3_origin_config {
       origin_access_identity = "origin-access-identity/cloudfront/E2GU6TU0J2ZZ5C"
