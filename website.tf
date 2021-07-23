@@ -5,6 +5,7 @@ data "template_file" "website_bucket_policy" {
   template = file("${path.module}/templates/s3_website_bucket_policy.json")
   vars = {
     bucket_name = local.website_bucket_name
+    cf_oai_arn  = "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity E2GU6TU0J2ZZ5C"
   }
 }
 
@@ -102,7 +103,7 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
     origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # Managed-CORS-S3Origin
     allowed_methods          = var.cloudfront_allowed_cached_methods
     cached_methods           = var.cloudfront_allowed_cached_methods
-    target_origin_id         = "S3-.${local.website_bucket_name}"
+    target_origin_id         = local.website_bucket_name
     viewer_protocol_policy   = var.cloudfront_viewer_protocol_policy
   }
 
