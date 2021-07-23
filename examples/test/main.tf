@@ -7,8 +7,7 @@ module "test_website" {
     aws.acm_provider = aws.acm_provider
   }
 
-  website_domain_name = "test.com"
-  enable_cloudfront   = true
-
-
+  website_domain_name    = "test.com"
+  enable_cloudfront      = true
+  create_acm_certificate = true
 }
