@@ -28,7 +28,7 @@ variable "log_bucket_versioning_mfa_delete" {
 
 variable "list_of_accounts_access_log_bucket" {
   description = "List of accounts that should be able to read logs from logs bucket"
-  type        = list(strings)
+  type        = list(string)
   default     = []
 }
 
