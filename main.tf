@@ -41,6 +41,16 @@ resource "aws_s3_bucket" "log_bucket" { # tfsec:ignore:AWS017
   }, var.tags)
 }
 
+resource "aws_s3_bucket_public_access_block" "log_bucket_public_access_block" {
+  provider = aws.main
+
+  bucket                  = aws_s3_bucket.log_bucket.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 data "aws_iam_policy_document" "log_bucket_access_policy" {
   provider = aws.main
 
@@ -67,18 +77,13 @@ data "aws_iam_policy_document" "log_bucket_access_policy" {
 resource "aws_s3_bucket_policy" "log_bucket_access_policy" {
   provider = aws.main
 
+  # Dependency to avoid writing bucket policy and public access block at the same time
+  depends_on = [
+    aws_s3_bucket_public_access_block.log_bucket_public_access_block,
+  ]
+
   bucket = aws_s3_bucket.log_bucket.id
   policy = data.aws_iam_policy_document.log_bucket_access_policy.json
-}
-
-resource "aws_s3_bucket_public_access_block" "log_bucket_public_access_block" {
-  provider = aws.main
-
-  bucket                  = aws_s3_bucket.log_bucket.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
 }
 
 #------------------------------------------------------------------------------
@@ -137,10 +142,14 @@ resource "aws_route53_record" "acm_certificate_validation_records" {
 resource "aws_acm_certificate_validation" "cert_validation" {
   provider = aws.acm_provider
 
+  # Dependency to guarantee that certificate and DNS records are created before this resource
+  depends_on = [
+    aws_acm_certificate.cert,
+    aws_route53_record.acm_certificate_validation_records,
+  ]
+
   count = var.create_acm_certificate ? 1 : 0
 
   certificate_arn         = aws_acm_certificate.cert[0].arn
   validation_record_fqdns = [for record in aws_route53_record.acm_certificate_validation_records : record.fqdn]
 }
-
-
