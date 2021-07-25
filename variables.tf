@@ -203,6 +203,21 @@ variable "cloudfront_website_wait_for_deployment" {
 }
 
 #------------------------------------------------------------------------------
+# Route53
+#------------------------------------------------------------------------------
+variable "create_route53_hosted_zone" {
+  description = "Enable or disable Route 53 hosted zone creation. If set to false, the variable route53_hosted_zone_id is required. Defaults to true"
+  type        = bool
+  default     = true
+}
+
+variable "route53_hosted_zone_id" {
+  description = "The Route 53 hosted zone ID to use if create_route53_hosted_zone is false"
+  type        = string
+  default     = ""
+}
+
+#------------------------------------------------------------------------------
 # ACM Certificate
 #------------------------------------------------------------------------------
 variable "create_acm_certificate" {

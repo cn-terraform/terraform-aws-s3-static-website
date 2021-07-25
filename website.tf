@@ -169,7 +169,7 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
 resource "aws_route53_record" "website_cloudfront_record" {
   provider = aws.main
 
-  zone_id = aws_route53_zone.hosted_zone.zone_id
+  zone_id = var.create_route53_hosted_zone ? aws_route53_zone.hosted_zone[0].zone_id : var.route53_hosted_zone_id
   name    = local.website_bucket_name
   type    = "A"
 
@@ -183,7 +183,7 @@ resource "aws_route53_record" "website_cloudfront_record" {
 resource "aws_route53_record" "www_website_record" {
   provider = aws.main
 
-  zone_id = aws_route53_zone.hosted_zone.zone_id
+  zone_id = var.create_route53_hosted_zone ? aws_route53_zone.hosted_zone[0].zone_id : var.route53_hosted_zone_id
   name    = local.www_website_bucket_name
   type    = "A"
 
