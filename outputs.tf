@@ -17,7 +17,7 @@ output "website_bucket_domain_name" {
 }
 
 output "website_bucket_regional_domain_name" {
-  description = "The bucket region-specific domain name. The bucket domain name including the region name, please refer here for format. Note: The AWS CloudFront allows specifying S3 region-specific endpoint when creating S3 origin, it will prevent redirect issues from CloudFront to S3 Origin URL."
+  description = "The bucket region-specific domain name. The bucket domain name including the region name, please refer to https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region for format. Note: The AWS CloudFront allows specifying S3 region-specific endpoints when creating S3 origin, it will prevent redirect issues from CloudFront to S3 Origin URL."
   value       = aws_s3_bucket.website.bucket_regional_domain_name
 }
 
@@ -118,7 +118,7 @@ output "hosted_zone_id" {
 }
 
 output "hosted_zone_name_servers" {
-  description = "A list of name servers in associated (or default) delegation set. Find more about delegation sets in AWS docs."
+  description = "A list of name servers in the associated (or default) delegation set. Find more about delegation sets in AWS docs."
   value       = aws_route53_zone.hosted_zone.name_servers
 }
 

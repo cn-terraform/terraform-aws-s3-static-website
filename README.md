@@ -1,6 +1,6 @@
 # AWS S3 Static Website #
 
-This Terraform module the required infrastructure to host an static website on S3.
+This Terraform module provides the required infrastructure to host a static website on S3.
 
 [![](https://github.com/cn-terraform/terraform-aws-s3-static-website/workflows/terraform/badge.svg)](https://github.com/cn-terraform/terraform-aws-s3-static-website/actions?query=workflow%3Aterraform)
 [![](https://img.shields.io/github/license/cn-terraform/terraform-aws-s3-static-website)](https://github.com/cn-terraform/terraform-aws-s3-static-website)
@@ -17,11 +17,11 @@ Check versions for this module on:
 
 ## Install pre commit hooks.
 
-Pleas run this command right after cloning the repository.
+Run this command right after cloning the repository.
 
         pre-commit install
 
-For that you may need to install the folowwing tools:
+For that you may need to install the following tools:
 * [Pre-commit](https://pre-commit.com/) 
 * [Terraform Docs](https://terraform-docs.io/)
 
@@ -134,7 +134,7 @@ No modules.
 | <a name="output_cloudfront_website_trusted_key_groups"></a> [cloudfront\_website\_trusted\_key\_groups](#output\_cloudfront\_website\_trusted\_key\_groups) | List of nested attributes for active trusted key groups, if the distribution is set up to serve private content with signed URLs |
 | <a name="output_cloudfront_website_trusted_signers"></a> [cloudfront\_website\_trusted\_signers](#output\_cloudfront\_website\_trusted\_signers) | List of nested attributes for active trusted signers, if the distribution is set up to serve private content with signed URLs |
 | <a name="output_hosted_zone_id"></a> [hosted\_zone\_id](#output\_hosted\_zone\_id) | The Hosted Zone ID. This can be referenced by zone records. |
-| <a name="output_hosted_zone_name_servers"></a> [hosted\_zone\_name\_servers](#output\_hosted\_zone\_name\_servers) | A list of name servers in associated (or default) delegation set. Find more about delegation sets in AWS docs. |
+| <a name="output_hosted_zone_name_servers"></a> [hosted\_zone\_name\_servers](#output\_hosted\_zone\_name\_servers) | A list of name servers in the associated (or default) delegation set. Find more about delegation sets in AWS docs. |
 | <a name="output_hosted_zone_tags_all"></a> [hosted\_zone\_tags\_all](#output\_hosted\_zone\_tags\_all) | A map of tags assigned to the resource, including those inherited from the provider default\_tags configuration block. |
 | <a name="output_route_53_record_website_fqdn"></a> [route\_53\_record\_website\_fqdn](#output\_route\_53\_record\_website\_fqdn) | FQDN built using the zone domain and name. |
 | <a name="output_route_53_record_website_name"></a> [route\_53\_record\_website\_name](#output\_route\_53\_record\_website\_name) | The name of the record. |
@@ -145,7 +145,7 @@ No modules.
 | <a name="output_website_bucket_hosted_zone_id"></a> [website\_bucket\_hosted\_zone\_id](#output\_website\_bucket\_hosted\_zone\_id) | The Route 53 Hosted Zone ID for this bucket's region. |
 | <a name="output_website_bucket_id"></a> [website\_bucket\_id](#output\_website\_bucket\_id) | The name of the bucket. |
 | <a name="output_website_bucket_region"></a> [website\_bucket\_region](#output\_website\_bucket\_region) | The AWS region this bucket resides in. |
-| <a name="output_website_bucket_regional_domain_name"></a> [website\_bucket\_regional\_domain\_name](#output\_website\_bucket\_regional\_domain\_name) | The bucket region-specific domain name. The bucket domain name including the region name, please refer here for format. Note: The AWS CloudFront allows specifying S3 region-specific endpoint when creating S3 origin, it will prevent redirect issues from CloudFront to S3 Origin URL. |
+| <a name="output_website_bucket_regional_domain_name"></a> [website\_bucket\_regional\_domain\_name](#output\_website\_bucket\_regional\_domain\_name) | The bucket region-specific domain name. The bucket domain name including the region name, please refer to https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region for format. Note: The AWS CloudFront allows specifying S3 region-specific endpoints when creating S3 origin, it will prevent redirect issues from CloudFront to S3 Origin URL. |
 | <a name="output_website_bucket_tags_all"></a> [website\_bucket\_tags\_all](#output\_website\_bucket\_tags\_all) | A map of tags assigned to the resource, including those inherited from the provider default\_tags configuration block. |
 | <a name="output_website_bucket_website_domain"></a> [website\_bucket\_website\_domain](#output\_website\_bucket\_website\_domain) | The domain of the website endpoint, if the bucket is configured with a website. If not, this will be an empty string. This is used to create Route 53 alias records. |
 | <a name="output_website_bucket_website_endpoint"></a> [website\_bucket\_website\_endpoint](#output\_website\_bucket\_website\_endpoint) | The website endpoint, if the bucket is configured with a website. If not, this will be an empty string. |
