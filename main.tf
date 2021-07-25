@@ -92,6 +92,8 @@ resource "aws_s3_bucket_policy" "log_bucket_access_policy" {
 resource "aws_route53_zone" "hosted_zone" {
   provider = aws.main
 
+  count = var.create_route53_hosted_zone ? 1 : 0
+
   name = var.website_domain_name
   tags = merge({
     Name = "${var.name_prefix}-hosted-zone"
@@ -136,7 +138,7 @@ resource "aws_route53_record" "acm_certificate_validation_records" {
   records         = [each.value.record]
   ttl             = 300
   type            = each.value.type
-  zone_id         = aws_route53_zone.hosted_zone.zone_id
+  zone_id         = var.create_route53_hosted_zone ? aws_route53_zone.hosted_zone[0].zone_id : var.route53_hosted_zone_id
 }
 
 resource "aws_acm_certificate_validation" "cert_validation" {

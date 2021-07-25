@@ -114,17 +114,17 @@ output "cloudfront_website_hosted_zone_id" {
 #------------------------------------------------------------------------------
 output "hosted_zone_id" {
   description = "The Hosted Zone ID. This can be referenced by zone records."
-  value       = aws_route53_zone.hosted_zone.zone_id
+  value       = var.create_route53_hosted_zone ? aws_route53_zone.hosted_zone[0].zone_id : var.route53_hosted_zone_id
 }
 
 output "hosted_zone_name_servers" {
   description = "A list of name servers in the associated (or default) delegation set. Find more about delegation sets in AWS docs."
-  value       = aws_route53_zone.hosted_zone.name_servers
+  value       = var.create_route53_hosted_zone ? aws_route53_zone.hosted_zone[0].name_servers : []
 }
 
 output "hosted_zone_tags_all" {
   description = "A map of tags assigned to the resource, including those inherited from the provider default_tags configuration block."
-  value       = aws_route53_zone.hosted_zone.tags_all
+  value       = var.create_route53_hosted_zone ? aws_route53_zone.hosted_zone[0].tags_all : {}
 }
 
 output "route_53_record_website_name" {
