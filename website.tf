@@ -18,8 +18,6 @@ data "template_file" "website_bucket_policy" {
   }
 }
 
-# tfsec issues ignored (https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteAccessPermissionsReqd.html)
-#  - AWS001: The contents of the bucket can be accessed publicly. Access should be allowed because it is hosting a website
 #  - AWS017: The bucket objects could be read if compromised. TODO, implement this.
 resource "aws_s3_bucket" "website" { # tfsec:ignore:AWS017
   provider = aws.main
