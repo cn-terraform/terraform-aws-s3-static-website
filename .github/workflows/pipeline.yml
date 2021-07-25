@@ -7,7 +7,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - run: terraform fmt -check -recursive -diff
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive -diff
+
+  security-check:
+    runs-on: ubuntu-latest
+    container: tfsec/tfsec
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Terraform Security Check
+        run: tfsec
 
   validate:
     runs-on: ubuntu-latest
