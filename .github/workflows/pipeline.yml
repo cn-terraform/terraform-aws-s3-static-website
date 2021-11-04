@@ -1,18 +1,15 @@
-name: terraform
+name: Terraform
 on: [push]
 jobs:
   check-format:
-    name: Terraform Format Check
     runs-on: ubuntu-latest
     container: hashicorp/terraform
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Terraform Format Check
-        run: terraform fmt -check -recursive -diff
+      - run: terraform fmt -check -recursive -diff
 
   validate:
-    name: Terraform Validate (examples/test)
     runs-on: ubuntu-latest
     container: hashicorp/terraform
     steps:
@@ -26,7 +23,6 @@ jobs:
         working-directory: examples/test
 
   mock-plan:
-    name: Terraform Mock Plan (examples/test)
     runs-on: ubuntu-latest
     container: hashicorp/terraform
     steps:
@@ -38,3 +34,17 @@ jobs:
       - name: Terraform Plan (Mock)
         run: terraform plan
         working-directory: examples/test
+
+  infracost:
+    runs-on: ubuntu-latest
+    name: Show infracost diff
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Run infracost diff
+        uses: infracost/infracost-gh-action@master
+        env:
+          INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          path: examples/test
