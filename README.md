@@ -35,15 +35,14 @@ In order to run all checks at any point run the following command:
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.74 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.74 |
-| <a name="provider_aws.acm_provider"></a> [aws.acm\_provider](#provider\_aws.acm\_provider) | >= 3.74 |
-| <a name="provider_aws.main"></a> [aws.main](#provider\_aws.main) | >= 3.74 |
+| <a name="provider_aws.acm_provider"></a> [aws.acm\_provider](#provider\_aws.acm\_provider) | >= 4.0 |
+| <a name="provider_aws.main"></a> [aws.main](#provider\_aws.main) | >= 4.0 |
 | <a name="provider_template"></a> [template](#provider\_template) | n/a |
 
 ## Modules

@@ -21,11 +21,15 @@ resource "aws_s3_bucket" "log_bucket" {
 }
 
 resource "aws_s3_bucket_acl" "log_bucket" {
+  provider = aws.main
+
   bucket = aws_s3_bucket.log_bucket.id
   acl    = "log-delivery-write"
 }
 
 resource "aws_s3_bucket_versioning" "log_bucket" {
+  provider = aws.main
+
   bucket = aws_s3_bucket.log_bucket.id
   versioning_configuration {
     status     = var.log_bucket_versioning_status

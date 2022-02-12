@@ -49,6 +49,8 @@ resource "aws_s3_bucket" "website" { # tfsec:ignore:AWS017
 }
 
 resource "aws_s3_bucket_versioning" "website" {
+  provider = aws.main
+
   bucket = aws_s3_bucket.website.id
   versioning_configuration {
     status     = var.website_versioning_status
@@ -57,6 +59,8 @@ resource "aws_s3_bucket_versioning" "website" {
 }
 
 resource "aws_s3_bucket_cors_configuration" "website" {
+  provider = aws.main
+
   bucket = aws_s3_bucket.website.id
 
   cors_rule {
@@ -69,12 +73,16 @@ resource "aws_s3_bucket_cors_configuration" "website" {
 }
 
 resource "aws_s3_bucket_logging" "website" {
+  provider = aws.main
+
   bucket        = aws_s3_bucket.website.id
   target_bucket = aws_s3_bucket.log_bucket.id
   target_prefix = "website/"
 }
 
 resource "aws_s3_bucket_website_configuration" "website" {
+  provider = aws.main
+
   bucket = aws_s3_bucket.website.id
 
   index_document {
@@ -87,11 +95,15 @@ resource "aws_s3_bucket_website_configuration" "website" {
 }
 
 resource "aws_s3_bucket_acl" "website" {
+  provider = aws.main
+
   bucket = aws_s3_bucket.website.id
   acl    = var.website_bucket_acl
 }
 
 resource "aws_s3_bucket_policy" "website" {
+  provider = aws.main
+
   bucket = aws_s3_bucket.website.id
   policy = data.template_file.website_bucket_policy.rendered
 }
