@@ -9,16 +9,11 @@ locals {
 #------------------------------------------------------------------------------
 # S3 Bucket for logs
 #------------------------------------------------------------------------------
-#tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging
+#tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "log_bucket" {
   provider = aws.main
 
   bucket = "${var.name_prefix}-log-bucket"
-
-  versioning {
-    enabled    = var.log_bucket_versioning_enabled
-    mfa_delete = var.log_bucket_versioning_mfa_delete
-  }
 
   tags = merge({
     Name = "${var.name_prefix}-logs"
@@ -28,6 +23,14 @@ resource "aws_s3_bucket" "log_bucket" {
 resource "aws_s3_bucket_acl" "log_bucket" {
   bucket = aws_s3_bucket.log_bucket.id
   acl    = "log-delivery-write"
+}
+
+resource "aws_s3_bucket_versioning" "log_bucket" {
+  bucket = aws_s3_bucket.log_bucket.id
+  versioning_configuration {
+    status     = var.log_bucket_versioning_status
+    mfa_delete = var.log_bucket_versioning_mfa_delete
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "log_bucket_public_access_block" {
