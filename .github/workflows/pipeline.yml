@@ -7,7 +7,7 @@ jobs:
     container: hashicorp/terraform
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Terraform Format Check
         run: terraform fmt -check -recursive -diff
 
@@ -17,7 +17,7 @@ jobs:
     container: hashicorp/terraform
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Terraform Init
         run: terraform init
         working-directory: examples/test
@@ -31,7 +31,7 @@ jobs:
     container: hashicorp/terraform
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Terraform Init
         run: terraform init
         working-directory: examples/test
