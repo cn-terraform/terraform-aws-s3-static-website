@@ -160,6 +160,15 @@ variable "cloudfront_allowed_cached_methods" {
   default     = ["GET", "HEAD"]
 }
 
+variable "cloudfront_function_association" {
+  description = "(Optional) Map containing information to associate a function to cloudfront. The first field is `event_type` of the function associated with default cache behavior, it can be viewer-request, viewer-response, origin-request, origin-response. The second field is `function_arn`, the ARN of the function associated with default cache behavior"
+  type = object({
+    event_type   = string
+    function_arn = string
+  })
+  default = null
+}
+
 variable "cloudfront_function_association_event_type" {
   description = "(Optional) Event Type of the function associated with default cache behavior. Can be viewer-request, viewer-response, origin-request, origin-response"
   type        = string

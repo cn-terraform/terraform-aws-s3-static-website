@@ -10,15 +10,7 @@ resource "aws_cloudfront_origin_access_identity" "cf_oai" {
 #------------------------------------------------------------------------------
 # Website S3 Bucket
 #------------------------------------------------------------------------------
-data "template_file" "website_bucket_policy" {
-  template = file("${path.module}/templates/s3_website_bucket_policy.json")
-  vars = {
-    bucket_name = local.website_bucket_name
-    cf_oai_arn  = aws_cloudfront_origin_access_identity.cf_oai.iam_arn
-  }
-}
-
-#tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging
+#tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "website" { # tfsec:ignore:AWS017
   provider = aws.main
 
@@ -76,7 +68,7 @@ resource "aws_s3_bucket_logging" "website" {
   provider = aws.main
 
   bucket        = aws_s3_bucket.website.id
-  target_bucket = aws_s3_bucket.log_bucket.id
+  target_bucket = module.s3_logs_bucket.s3_bucket_id
   target_prefix = "website/"
 }
 
@@ -105,7 +97,10 @@ resource "aws_s3_bucket_policy" "website" {
   provider = aws.main
 
   bucket = aws_s3_bucket.website.id
-  policy = data.template_file.website_bucket_policy.rendered
+  policy = templatefile("${path.module}/templates/s3_website_bucket_policy.json", {
+    bucket_name = local.website_bucket_name
+    cf_oai_arn  = aws_cloudfront_origin_access_identity.cf_oai.iam_arn
+  })
 }
 
 resource "aws_s3_bucket_public_access_block" "website_bucket_public_access_block" {
@@ -144,9 +139,13 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
     cached_methods           = var.cloudfront_allowed_cached_methods
     target_origin_id         = local.website_bucket_name
     viewer_protocol_policy   = var.cloudfront_viewer_protocol_policy
-    function_association {
-      event_type   = var.cloudfront_function_association_event_type
-      function_arn = var.cloudfront_function_association_function_arn
+
+    dynamic "function_association" {
+      for_each = var.cloudfront_function_association == null ? [] : [var.cloudfront_function_association]
+      content {
+        event_type   = function_association.value.event_type
+        function_arn = function_association.value.function_arn
+      }
     }
   }
 
@@ -157,7 +156,7 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
 
   logging_config {
     include_cookies = false
-    bucket          = aws_s3_bucket.log_bucket.bucket_domain_name
+    bucket          = module.s3_logs_bucket.s3_bucket_domain_name
     prefix          = "cloudfront_website"
   }
 

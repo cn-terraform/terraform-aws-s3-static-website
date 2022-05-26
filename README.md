@@ -41,13 +41,14 @@ In order to run all checks at any point run the following command:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws.acm_provider"></a> [aws.acm\_provider](#provider\_aws.acm\_provider) | >= 4.0 |
-| <a name="provider_aws.main"></a> [aws.main](#provider\_aws.main) | >= 4.0 |
-| <a name="provider_template"></a> [template](#provider\_template) | n/a |
+| <a name="provider_aws.acm_provider"></a> [aws.acm\_provider](#provider\_aws.acm\_provider) | 4.15.1 |
+| <a name="provider_aws.main"></a> [aws.main](#provider\_aws.main) | 4.15.1 |
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_s3_logs_bucket"></a> [s3\_logs\_bucket](#module\_s3\_logs\_bucket) | cn-terraform/logs-s3-bucket/aws | 1.0.1 |
 
 ## Resources
 
@@ -61,21 +62,14 @@ No modules.
 | [aws_route53_record.website_cloudfront_record](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_route53_record.www_website_record](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_route53_zone.hosted_zone](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_zone) | resource |
-| [aws_s3_bucket.log_bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
 | [aws_s3_bucket.website](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
-| [aws_s3_bucket_acl.log_bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_acl) | resource |
 | [aws_s3_bucket_acl.website](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_acl) | resource |
 | [aws_s3_bucket_cors_configuration.website](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_cors_configuration) | resource |
 | [aws_s3_bucket_logging.website](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_logging) | resource |
-| [aws_s3_bucket_policy.log_bucket_access_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_policy) | resource |
 | [aws_s3_bucket_policy.website](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_policy) | resource |
-| [aws_s3_bucket_public_access_block.log_bucket_public_access_block](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
 | [aws_s3_bucket_public_access_block.website_bucket_public_access_block](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
-| [aws_s3_bucket_versioning.log_bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_versioning) | resource |
 | [aws_s3_bucket_versioning.website](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_versioning) | resource |
 | [aws_s3_bucket_website_configuration.website](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_website_configuration) | resource |
-| [aws_iam_policy_document.log_bucket_access_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
-| [template_file.website_bucket_policy](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file) | data source |
 
 ## Inputs
 
@@ -84,9 +78,10 @@ No modules.
 | <a name="input_acm_certificate_arn_to_use"></a> [acm\_certificate\_arn\_to\_use](#input\_acm\_certificate\_arn\_to\_use) | ACM Certificate ARN to use in case you disable automatic certificate creation. Certificate must be in us-east-1 region. | `string` | `""` | no |
 | <a name="input_aws_accounts_with_read_view_log_bucket"></a> [aws\_accounts\_with\_read\_view\_log\_bucket](#input\_aws\_accounts\_with\_read\_view\_log\_bucket) | List of AWS accounts with read permissions to log bucket | `list(string)` | `[]` | no |
 | <a name="input_cloudfront_allowed_cached_methods"></a> [cloudfront\_allowed\_cached\_methods](#input\_cloudfront\_allowed\_cached\_methods) | (Optional) Specifies which methods are allowed and cached by CloudFront. Can be GET, PUT, POST, DELETE or HEAD. Defaults to GET and HEAD | `list(string)` | <pre>[<br>  "GET",<br>  "HEAD"<br>]</pre> | no |
-| <a name="input_cloudfront_function_association_event_type"></a> [cloudfront\_function\_association\_event\_type](#input\_cloudfront\_function\_association\_event\_type) | (Optional) Event Type of the function associated with default cache behavior. Can be viewer-request, viewer-response, origin-request, origin-response | `string` | null | no |
-| <a name="input_cloudfront_function_association_function_arn"></a> [cloudfront\_function\_association\_function\_arn](#input\_cloudfront\_function\_association\_function\_arn) | (Optional) ARN of the function associated with default cache behavior| `string` | null | no |
 | <a name="input_cloudfront_default_root_object"></a> [cloudfront\_default\_root\_object](#input\_cloudfront\_default\_root\_object) | (Optional) - The object that you want CloudFront to return (for example, index.html) when an end user requests the root URL. Defaults to index.html | `string` | `"index.html"` | no |
+| <a name="input_cloudfront_function_association"></a> [cloudfront\_function\_association](#input\_cloudfront\_function\_association) | (Optional) Map containing information to associate a function to cloudfront. The first field is `event_type` of the function associated with default cache behavior, it can be viewer-request, viewer-response, origin-request, origin-response. The second field is `function_arn`, the ARN of the function associated with default cache behavior | <pre>object({<br>    event_type   = string<br>    function_arn = string<br>  })</pre> | `null` | no |
+| <a name="input_cloudfront_function_association_event_type"></a> [cloudfront\_function\_association\_event\_type](#input\_cloudfront\_function\_association\_event\_type) | (Optional) Event Type of the function associated with default cache behavior. Can be viewer-request, viewer-response, origin-request, origin-response | `string` | `null` | no |
+| <a name="input_cloudfront_function_association_function_arn"></a> [cloudfront\_function\_association\_function\_arn](#input\_cloudfront\_function\_association\_function\_arn) | (Optional) ARN of the function associated with default cache behavior | `string` | `null` | no |
 | <a name="input_cloudfront_geo_restriction_locations"></a> [cloudfront\_geo\_restriction\_locations](#input\_cloudfront\_geo\_restriction\_locations) | (Optional) - The ISO 3166-1-alpha-2 codes for which you want CloudFront either to distribute your content (whitelist) or not distribute your content (blacklist). Defaults to [] | `list(string)` | `[]` | no |
 | <a name="input_cloudfront_geo_restriction_type"></a> [cloudfront\_geo\_restriction\_type](#input\_cloudfront\_geo\_restriction\_type) | The method that you want to use to restrict distribution of your content by country: none, whitelist, or blacklist. Defaults to none | `string` | `"none"` | no |
 | <a name="input_cloudfront_http_version"></a> [cloudfront\_http\_version](#input\_cloudfront\_http\_version) | (Optional) - The maximum HTTP version to support on the distribution. Allowed values are http1.1 and http2. The default is http2. | `string` | `"http2"` | no |
