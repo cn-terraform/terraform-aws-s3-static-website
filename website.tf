@@ -144,6 +144,10 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
     cached_methods           = var.cloudfront_allowed_cached_methods
     target_origin_id         = local.website_bucket_name
     viewer_protocol_policy   = var.cloudfront_viewer_protocol_policy
+    function_association {
+      event_type   = var.cloudfront_function_association_event_type
+      function_arn = var.cloudfront_function_association_function_arn
+    }
   }
 
   default_root_object = var.cloudfront_default_root_object
