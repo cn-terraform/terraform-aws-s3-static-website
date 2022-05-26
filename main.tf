@@ -1,18 +1,4 @@
 #------------------------------------------------------------------------------
-# Terraform Required Providers
-#------------------------------------------------------------------------------
-terraform {
-  required_version = ">= 0.13"
-  required_providers {
-    aws = {
-      source                = "hashicorp/aws"
-      version               = ">= 3.50.0"
-      configuration_aliases = [aws.main, aws.acm_provider]
-    }
-  }
-}
-
-#------------------------------------------------------------------------------
 # Locals
 #------------------------------------------------------------------------------
 locals {
@@ -23,22 +9,32 @@ locals {
 #------------------------------------------------------------------------------
 # S3 Bucket for logs
 #------------------------------------------------------------------------------
-# tfsec issues ignored
-#  - AWS017: The bucket objects could be read if compromised
-resource "aws_s3_bucket" "log_bucket" { # tfsec:ignore:AWS017
+#tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging
+resource "aws_s3_bucket" "log_bucket" {
   provider = aws.main
 
   bucket = "${var.name_prefix}-log-bucket"
-  acl    = "log-delivery-write"
-
-  versioning {
-    enabled    = var.log_bucket_versioning_enabled
-    mfa_delete = var.log_bucket_versioning_mfa_delete
-  }
 
   tags = merge({
     Name = "${var.name_prefix}-logs"
   }, var.tags)
+}
+
+resource "aws_s3_bucket_acl" "log_bucket" {
+  provider = aws.main
+
+  bucket = aws_s3_bucket.log_bucket.id
+  acl    = "log-delivery-write"
+}
+
+resource "aws_s3_bucket_versioning" "log_bucket" {
+  provider = aws.main
+
+  bucket = aws_s3_bucket.log_bucket.id
+  versioning_configuration {
+    status     = var.log_bucket_versioning_status
+    mfa_delete = var.log_bucket_versioning_mfa_delete
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "log_bucket_public_access_block" {

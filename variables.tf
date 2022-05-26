@@ -14,16 +14,16 @@ variable "tags" {
 #------------------------------------------------------------------------------
 # Log Bucket
 #------------------------------------------------------------------------------
-variable "log_bucket_versioning_enabled" {
-  description = "(Optional) Enable versioning. Once you version-enable a bucket, it can never return to an unversioned state. You can, however, suspend versioning on that bucket. Defaults to true"
-  type        = bool
-  default     = true
+variable "log_bucket_versioning_status" {
+  description = "(Optional) The versioning state of the bucket. Valid values: Enabled or Suspended. Defaults to Enabled"
+  type        = string
+  default     = "Enabled"
 }
 
 variable "log_bucket_versioning_mfa_delete" {
-  description = "(Optional) Enable MFA delete for either change the versioning state of your bucket or permanently delete an object version. Default is false. This cannot be used to toggle this setting but is available to allow managed buckets to reflect the state in AWS."
-  type        = bool
-  default     = false
+  description = "(Optional) Specifies whether MFA delete is enabled in the bucket versioning configuration. Valid values: Enabled or Disabled. Defaults to Disabled"
+  type        = string
+  default     = "Disabled"
 }
 
 variable "aws_accounts_with_read_view_log_bucket" {
@@ -94,16 +94,16 @@ variable "website_cors_max_age_seconds" {
   default     = 3600
 }
 
-variable "website_versioning_enabled" {
-  description = "(Optional) Enable versioning. Once you version-enable a bucket, it can never return to an unversioned state. You can, however, suspend versioning on that bucket. Defaults to true"
-  type        = bool
-  default     = true
+variable "website_versioning_status" {
+  description = "(Optional) The versioning state of the bucket. Valid values: Enabled or Suspended. Defaults to Enabled"
+  type        = string
+  default     = "Enabled"
 }
 
 variable "website_versioning_mfa_delete" {
-  description = "(Optional) Enable MFA delete for either change the versioning state of your bucket or permanently delete an object version. Default is false. This cannot be used to toggle this setting but is available to allow managed buckets to reflect the state in AWS."
-  type        = bool
-  default     = false
+  description = "(Optional) Specifies whether MFA delete is enabled in the bucket versioning configuration. Valid values: Enabled or Disabled. Defaults to Disabled"
+  type        = string
+  default     = "Disabled"
 }
 
 #------------------------------------------------------------------------------
@@ -158,6 +158,18 @@ variable "cloudfront_allowed_cached_methods" {
   description = "(Optional) Specifies which methods are allowed and cached by CloudFront. Can be GET, PUT, POST, DELETE or HEAD. Defaults to GET and HEAD"
   type        = list(string)
   default     = ["GET", "HEAD"]
+}
+
+variable "cloudfront_function_association_event_type" {
+  description = "(Optional) Event Type of the function associated with default cache behavior. Can be viewer-request, viewer-response, origin-request, origin-response"
+  type        = string
+  default     = null
+}
+
+variable "cloudfront_function_association_function_arn" {
+  description = "(Optional) ARN of the function associated with default cache behavior"
+  type        = string
+  default     = null
 }
 
 variable "cloudfront_default_root_object" {

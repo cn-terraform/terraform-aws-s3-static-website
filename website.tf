@@ -18,37 +18,12 @@ data "template_file" "website_bucket_policy" {
   }
 }
 
-#  - AWS017: The bucket objects could be read if compromised. TODO, implement this.
+#tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "website" { # tfsec:ignore:AWS017
   provider = aws.main
 
   bucket        = local.website_bucket_name
-  acl           = var.website_bucket_acl
-  policy        = data.template_file.website_bucket_policy.rendered # tfsec:ignore:AWS001
   force_destroy = var.website_bucket_force_destroy
-
-  website {
-    index_document = var.website_index_document
-    error_document = var.website_error_document
-  }
-
-  cors_rule {
-    allowed_headers = var.website_cors_allowed_headers
-    allowed_methods = var.website_cors_allowed_methods
-    allowed_origins = concat(["http://${var.website_domain_name}", "https://${var.website_domain_name}"], var.website_cors_additional_allowed_origins)
-    expose_headers  = var.website_cors_expose_headers
-    max_age_seconds = var.website_cors_max_age_seconds
-  }
-
-  versioning {
-    enabled    = var.website_versioning_enabled
-    mfa_delete = var.website_versioning_mfa_delete
-  }
-
-  logging {
-    target_bucket = aws_s3_bucket.log_bucket.id
-    target_prefix = "website/"
-  }
 
   # TODO - Add Lifecyle rule parameters
   # lifecycle_rule - (Optional) A configuration of object lifecycle management.
@@ -71,6 +46,66 @@ resource "aws_s3_bucket" "website" { # tfsec:ignore:AWS017
   tags = merge({
     Name = "${var.name_prefix}-website"
   }, var.tags)
+}
+
+resource "aws_s3_bucket_versioning" "website" {
+  provider = aws.main
+
+  bucket = aws_s3_bucket.website.id
+  versioning_configuration {
+    status     = var.website_versioning_status
+    mfa_delete = var.website_versioning_mfa_delete
+  }
+}
+
+resource "aws_s3_bucket_cors_configuration" "website" {
+  provider = aws.main
+
+  bucket = aws_s3_bucket.website.id
+
+  cors_rule {
+    allowed_headers = var.website_cors_allowed_headers
+    allowed_methods = var.website_cors_allowed_methods
+    allowed_origins = concat(["http://${var.website_domain_name}", "https://${var.website_domain_name}"], var.website_cors_additional_allowed_origins)
+    expose_headers  = var.website_cors_expose_headers
+    max_age_seconds = var.website_cors_max_age_seconds
+  }
+}
+
+resource "aws_s3_bucket_logging" "website" {
+  provider = aws.main
+
+  bucket        = aws_s3_bucket.website.id
+  target_bucket = aws_s3_bucket.log_bucket.id
+  target_prefix = "website/"
+}
+
+resource "aws_s3_bucket_website_configuration" "website" {
+  provider = aws.main
+
+  bucket = aws_s3_bucket.website.id
+
+  index_document {
+    suffix = var.website_index_document
+  }
+
+  error_document {
+    key = var.website_error_document
+  }
+}
+
+resource "aws_s3_bucket_acl" "website" {
+  provider = aws.main
+
+  bucket = aws_s3_bucket.website.id
+  acl    = var.website_bucket_acl
+}
+
+resource "aws_s3_bucket_policy" "website" {
+  provider = aws.main
+
+  bucket = aws_s3_bucket.website.id
+  policy = data.template_file.website_bucket_policy.rendered
 }
 
 resource "aws_s3_bucket_public_access_block" "website_bucket_public_access_block" {
@@ -109,6 +144,10 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
     cached_methods           = var.cloudfront_allowed_cached_methods
     target_origin_id         = local.website_bucket_name
     viewer_protocol_policy   = var.cloudfront_viewer_protocol_policy
+    function_association {
+      event_type   = var.cloudfront_function_association_event_type
+      function_arn = var.cloudfront_function_association_function_arn
+    }
   }
 
   default_root_object = var.cloudfront_default_root_object
