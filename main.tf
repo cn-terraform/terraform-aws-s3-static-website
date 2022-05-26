@@ -9,7 +9,7 @@ locals {
 #------------------------------------------------------------------------------
 # S3 Bucket for logs
 #------------------------------------------------------------------------------
-#tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging
+#tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "log_bucket" {
   provider = aws.main
 
