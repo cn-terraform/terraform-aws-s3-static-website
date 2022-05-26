@@ -7,79 +7,28 @@ locals {
 }
 
 #------------------------------------------------------------------------------
-# S3 Bucket for logs
+# S3 BUCKET - For access logs
 #------------------------------------------------------------------------------
-#tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging
-resource "aws_s3_bucket" "log_bucket" {
-  provider = aws.main
+#tfsec:ignore:aws-s3-enable-versioning
+module "s3_logs_bucket" {
+  providers = {
+    aws = aws.main
+  }
 
-  bucket = "${var.name_prefix}-log-bucket"
+  source  = "cn-terraform/logs-s3-bucket/aws"
+  version = "1.0.1"
+  # source  = "../terraform-aws-logs-s3-bucket"
+
+  name_prefix                   = "${var.name_prefix}-log-bucket"
+  aws_principals_identifiers    = formatlist("arn:aws:iam::%s:root", var.aws_accounts_with_read_view_log_bucket)
+  block_s3_bucket_public_access = true
+  # enable_s3_bucket_server_side_encryption        = var.enable_s3_bucket_server_side_encryption
+  # s3_bucket_server_side_encryption_sse_algorithm = var.s3_bucket_server_side_encryption_sse_algorithm
+  # s3_bucket_server_side_encryption_key           = var.s3_bucket_server_side_encryption_key
 
   tags = merge({
     Name = "${var.name_prefix}-logs"
   }, var.tags)
-}
-
-resource "aws_s3_bucket_acl" "log_bucket" {
-  provider = aws.main
-
-  bucket = aws_s3_bucket.log_bucket.id
-  acl    = "log-delivery-write"
-}
-
-resource "aws_s3_bucket_versioning" "log_bucket" {
-  provider = aws.main
-
-  bucket = aws_s3_bucket.log_bucket.id
-  versioning_configuration {
-    status     = var.log_bucket_versioning_status
-    mfa_delete = var.log_bucket_versioning_mfa_delete
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "log_bucket_public_access_block" {
-  provider = aws.main
-
-  bucket                  = aws_s3_bucket.log_bucket.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-data "aws_iam_policy_document" "log_bucket_access_policy" {
-  provider = aws.main
-
-  statement {
-    sid = "Allow access to logs bucket to current account"
-
-    actions = [
-      "s3:List*",
-      "s3:Get*",
-    ]
-
-    resources = [
-      aws_s3_bucket.log_bucket.arn,
-      "${aws_s3_bucket.log_bucket.arn}/*",
-    ]
-
-    principals {
-      type        = "AWS"
-      identifiers = formatlist("arn:aws:iam::%s:root", var.aws_accounts_with_read_view_log_bucket)
-    }
-  }
-}
-
-resource "aws_s3_bucket_policy" "log_bucket_access_policy" {
-  provider = aws.main
-
-  # Dependency to avoid writing bucket policy and public access block at the same time
-  depends_on = [
-    aws_s3_bucket_public_access_block.log_bucket_public_access_block,
-  ]
-
-  bucket = aws_s3_bucket.log_bucket.id
-  policy = data.aws_iam_policy_document.log_bucket_access_policy.json
 }
 
 #------------------------------------------------------------------------------

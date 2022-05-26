@@ -68,7 +68,7 @@ resource "aws_s3_bucket_logging" "website" {
   provider = aws.main
 
   bucket        = aws_s3_bucket.website.id
-  target_bucket = aws_s3_bucket.log_bucket.id
+  target_bucket = module.s3_logs_bucket.s3_bucket_id
   target_prefix = "website/"
 }
 
@@ -156,7 +156,7 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
 
   logging_config {
     include_cookies = false
-    bucket          = aws_s3_bucket.log_bucket.bucket_domain_name
+    bucket          = module.s3_logs_bucket.s3_bucket_domain_name
     prefix          = "cloudfront_website"
   }
 
