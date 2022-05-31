@@ -169,18 +169,6 @@ variable "cloudfront_function_association" {
   default = null
 }
 
-variable "cloudfront_function_association_event_type" {
-  description = "(Optional) Event Type of the function associated with default cache behavior. Can be viewer-request, viewer-response, origin-request, origin-response"
-  type        = string
-  default     = null
-}
-
-variable "cloudfront_function_association_function_arn" {
-  description = "(Optional) ARN of the function associated with default cache behavior"
-  type        = string
-  default     = null
-}
-
 variable "cloudfront_default_root_object" {
   description = "(Optional) - The object that you want CloudFront to return (for example, index.html) when an end user requests the root URL. Defaults to index.html"
   type        = string
