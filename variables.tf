@@ -169,6 +169,17 @@ variable "cloudfront_function_association" {
   default = null
 }
 
+variable "cloudfront_custom_error_responses" {
+  description = "A list of custom error responses"
+  type = list(object({
+    error_caching_min_ttl = number
+    error_code            = number
+    response_code         = number
+    response_page_path    = string
+  }))
+  default = []
+}
+
 variable "cloudfront_default_root_object" {
   description = "(Optional) - The object that you want CloudFront to return (for example, index.html) when an end user requests the root URL. Defaults to index.html"
   type        = string
