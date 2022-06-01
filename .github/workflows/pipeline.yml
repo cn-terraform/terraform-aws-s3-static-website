@@ -1,5 +1,9 @@
 name: Terraform
-on: [push]
+on:
+  push:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
 jobs:
   check-format:
     runs-on: ubuntu-latest
