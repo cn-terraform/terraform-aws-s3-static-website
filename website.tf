@@ -149,6 +149,16 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
     }
   }
 
+  dynamic "custom_error_response" {
+    for_each = var.cloudfront_custom_error_responses
+    content {
+      error_caching_min_ttl = custom_error_response.value.error_caching_min_ttl
+      error_code            = custom_error_response.value.error_code
+      response_code         = custom_error_response.value.response_code
+      response_page_path    = custom_error_response.value.response_page_path
+    }
+  }
+
   default_root_object = var.cloudfront_default_root_object
   enabled             = true
   is_ipv6_enabled     = var.is_ipv6_enabled
