@@ -161,7 +161,7 @@ variable "cloudfront_allowed_cached_methods" {
 }
 
 variable "cloudfront_function_association" {
-  description = "(Optional - up to 2 per ditsribution) List containing information to associate a CF function to cloudfront. The first field is `event_type` of the CF function associated with default cache behavior, it can be viewer-request or viewer-response"
+  description = "(Optional - up to 2 per distribution) List containing information to associate a CF function to cloudfront. The first field is `event_type` of the CF function associated with default cache behavior, it can be viewer-request or viewer-response"
   type = list(object({
     event_type   = string
     function_arn = string
