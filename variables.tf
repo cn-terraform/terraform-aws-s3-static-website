@@ -181,9 +181,9 @@ variable "cloudfront_custom_error_responses" {
 }
 
 variable "cloudfront_web_acl_id" {
-  description = "(Optional) A unique identifier that specifies the AWS WAF web ACL, if any, to associate with this distribution."  
-  type = string
-  default = null
+  description = "(Optional) A unique identifier that specifies the AWS WAF web ACL, if any, to associate with this distribution."
+  type        = string
+  default     = null
 }
 
 variable "cloudfront_default_root_object" {
