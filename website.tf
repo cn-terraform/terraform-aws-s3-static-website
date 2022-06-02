@@ -126,6 +126,8 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
     local.www_website_bucket_name
   ]
 
+  web_acl_id = var.cloudfront_web_acl_id
+
   comment = var.comment_for_cloudfront_website
 
   # TODO - Add variable for Custom Error Responses

@@ -180,6 +180,12 @@ variable "cloudfront_custom_error_responses" {
   default = []
 }
 
+variable "cloudfront_web_acl_id" {
+  description = "(Optional) A unique identifier that specifies the AWS WAF web ACL, if any, to associate with this distribution."  
+  type = string
+  default = null
+}
+
 variable "cloudfront_default_root_object" {
   description = "(Optional) - The object that you want CloudFront to return (for example, index.html) when an end user requests the root URL. Defaults to index.html"
   type        = string
