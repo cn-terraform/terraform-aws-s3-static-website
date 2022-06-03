@@ -126,6 +126,8 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
     local.www_website_bucket_name
   ]
 
+  web_acl_id = var.cloudfront_web_acl_id
+
   comment = var.comment_for_cloudfront_website
 
   # TODO - Add variable for Custom Error Responses
@@ -141,7 +143,7 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
     viewer_protocol_policy   = var.cloudfront_viewer_protocol_policy
 
     dynamic "function_association" {
-      for_each = var.cloudfront_function_association == null ? [] : [var.cloudfront_function_association]
+      for_each = var.cloudfront_function_association
       content {
         event_type   = function_association.value.event_type
         function_arn = function_association.value.function_arn
