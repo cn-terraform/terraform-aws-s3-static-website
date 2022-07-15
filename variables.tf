@@ -160,6 +160,12 @@ variable "cloudfront_allowed_cached_methods" {
   default     = ["GET", "HEAD"]
 }
 
+variable "cloudfront_enable_compression" {
+  description = "(Optional, Default:false) Enable compression with Gzip or Brotli for requests with a valid Accept-Encoding header"
+  type        = bool
+  default     = false
+}
+
 variable "cloudfront_function_association" {
   description = "(Optional - up to 2 per distribution) List containing information to associate a CF function to cloudfront. The first field is `event_type` of the CF function associated with default cache behavior, it can be viewer-request or viewer-response"
   type = list(object({
