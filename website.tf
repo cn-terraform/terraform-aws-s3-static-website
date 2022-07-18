@@ -141,6 +141,7 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
     cached_methods           = var.cloudfront_allowed_cached_methods
     target_origin_id         = local.website_bucket_name
     viewer_protocol_policy   = var.cloudfront_viewer_protocol_policy
+    compress                 = var.cloudfront_enable_compression
 
     dynamic "function_association" {
       for_each = var.cloudfront_function_association
