@@ -104,7 +104,7 @@ resource "aws_s3_bucket_public_access_block" "website_bucket_public_access_block
   block_public_policy     = true
 }
 
-resource "aws_s3_bucket_website_server_side_encryption_configuration" "website_bucket_website_server_side_encryption_configuration" {
+resource "aws_s3_bucket_server_side_encryption_configuration" "website_bucket_website_server_side_encryption_configuration" {
   provider = aws.main
   count    = length(keys(var.website_server_side_encryption_configuration)) > 0 ? 1 : 0
 
