@@ -106,6 +106,12 @@ variable "website_versioning_mfa_delete" {
   default     = "Disabled"
 }
 
+variable "website_server_side_encryption_configuration" {
+  description = "(Optional) Map containing server-side encryption configuration for the website bucket. Defaults to no encryption. See examples/complete/main.tf for configuration example."
+  type        = any
+  default     = {}
+}
+
 #------------------------------------------------------------------------------
 # WWW Website for redirection to Website
 #------------------------------------------------------------------------------

@@ -10,7 +10,7 @@ resource "aws_cloudfront_origin_access_identity" "cf_oai" {
 #------------------------------------------------------------------------------
 # Website S3 Bucket
 #------------------------------------------------------------------------------
-#tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging
+#tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "website" { # tfsec:ignore:AWS017
   provider = aws.main
 
@@ -22,15 +22,6 @@ resource "aws_s3_bucket" "website" { # tfsec:ignore:AWS017
 
   # TODO - Add replication configuration parameters
   # replication_configuration - (Optional) A configuration of replication configuration.
-
-  # TODO - Review how to add server side encryption
-  # server_side_encryption_configuration {
-  #   rule {
-  #     apply_server_side_encryption_by_default {
-  #       sse_algorithm = "aws:kms"
-  #     }
-  #   }
-  # }
 
   # TODO - Add variables for S3 object locking
   # object_lock_configuration - (Optional) A configuration of S3 object locking
@@ -111,6 +102,30 @@ resource "aws_s3_bucket_public_access_block" "website_bucket_public_access_block
   block_public_acls       = true
   restrict_public_buckets = true
   block_public_policy     = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "website_bucket_website_server_side_encryption_configuration" {
+  provider = aws.main
+  count    = length(keys(var.website_server_side_encryption_configuration)) > 0 ? 1 : 0
+
+  bucket = aws_s3_bucket.website.id
+
+  dynamic "rule" {
+    for_each = try(flatten([var.website_server_side_encryption_configuration["rule"]]), [])
+
+    content {
+      bucket_key_enabled = try(rule.value.bucket_key_enabled, null)
+
+      dynamic "apply_server_side_encryption_by_default" {
+        for_each = try([rule.value.apply_server_side_encryption_by_default], [])
+
+        content {
+          sse_algorithm     = apply_server_side_encryption_by_default.value.sse_algorithm
+          kms_master_key_id = try(apply_server_side_encryption_by_default.value.kms_master_key_id, null)
+        }
+      }
+    }
+  }
 }
 
 #------------------------------------------------------------------------------
