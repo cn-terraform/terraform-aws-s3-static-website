@@ -14,4 +14,12 @@ module "test_website" {
   create_route53_hosted_zone = true
 
   aws_accounts_with_read_view_log_bucket = ["mock_account"]
+
+  website_server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
 }
