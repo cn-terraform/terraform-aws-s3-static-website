@@ -16,7 +16,7 @@ module "s3_logs_bucket" {
   }
 
   source  = "cn-terraform/logs-s3-bucket/aws"
-  version = "1.0.4"
+  version = "1.0.5"
   # source  = "../terraform-aws-logs-s3-bucket"
 
   name_prefix                   = "${var.name_prefix}-log-bucket"
