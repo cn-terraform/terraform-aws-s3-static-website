@@ -22,4 +22,6 @@ module "test_website" {
       }
     }
   }
+
+  log_bucket_force_destroy = false
 }
