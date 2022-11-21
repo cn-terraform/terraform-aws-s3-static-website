@@ -26,6 +26,12 @@ variable "log_bucket_versioning_mfa_delete" {
   default     = "Disabled"
 }
 
+variable "log_bucket_force_destroy" {
+  description = "(Optional, Default:false) A boolean that indicates all objects (including any locked objects) should be deleted from the log bucket so that the bucket can be destroyed without error. These objects are not recoverable."
+  type        = bool
+  default     = false
+}
+
 variable "aws_accounts_with_read_view_log_bucket" {
   description = "List of AWS accounts with read permissions to log bucket"
   type        = list(string)

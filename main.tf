@@ -22,6 +22,7 @@ module "s3_logs_bucket" {
   name_prefix                   = "${var.name_prefix}-log-bucket"
   aws_principals_identifiers    = formatlist("arn:aws:iam::%s:root", var.aws_accounts_with_read_view_log_bucket)
   block_s3_bucket_public_access = true
+  s3_bucket_force_destroy       = var.log_bucket_force_destroy
   # enable_s3_bucket_server_side_encryption        = var.enable_s3_bucket_server_side_encryption
   # s3_bucket_server_side_encryption_sse_algorithm = var.s3_bucket_server_side_encryption_sse_algorithm
   # s3_bucket_server_side_encryption_key           = var.s3_bucket_server_side_encryption_key
