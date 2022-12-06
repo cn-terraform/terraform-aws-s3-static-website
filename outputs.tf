@@ -129,22 +129,22 @@ output "hosted_zone_tags_all" {
 
 output "route_53_record_website_name" {
   description = "The name of the record."
-  value       = aws_route53_record.website_cloudfront_record.name
+  value       = var.create_route53_website_records == true ? aws_route53_record.website_cloudfront_record[0].name : null
 }
 
 output "route_53_record_website_fqdn" {
   description = "FQDN built using the zone domain and name."
-  value       = aws_route53_record.website_cloudfront_record.fqdn
+  value       = var.create_route53_website_records == true ? aws_route53_record.website_cloudfront_record[0].fqdn : null
 }
 
 output "route_53_record_www_website_name" {
   description = "The name of the record."
-  value       = aws_route53_record.www_website_record.name
+  value       = var.create_route53_website_records == true ? aws_route53_record.www_website_record[0].name : null
 }
 
 output "route_53_record_www_website_fqdn" {
   description = "FQDN built using the zone domain and name."
-  value       = aws_route53_record.www_website_record.fqdn
+  value       = var.create_route53_website_records == true ? aws_route53_record.www_website_record[0].fqdn : null
 }
 
 #------------------------------------------------------------------------------
