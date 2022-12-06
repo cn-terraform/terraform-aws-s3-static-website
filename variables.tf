@@ -261,7 +261,7 @@ variable "route53_hosted_zone_id" {
   default     = ""
 }
 
-variable "create_route53_records" {
+variable "create_route53_website_records" {
   description = "Enable or disable creation of Route 53 records in the hosted zone. Defaults to true"
   type        = bool
   default     = true
