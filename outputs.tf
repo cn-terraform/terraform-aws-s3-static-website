@@ -129,7 +129,7 @@ output "hosted_zone_tags_all" {
 
 output "route_53_record_website_name" {
   description = "The name of the record."
-  value       = var.create_route53_website_records == true ? aws_route53_record.website_cloudfront_record[0].name : {}
+  value       = var.create_route53_website_records == true ? aws_route53_record.website_cloudfront_record[0].name : null
 }
 
 output "route_53_record_website_fqdn" {
