@@ -144,7 +144,7 @@ output "route_53_record_www_website_name" {
 
 output "route_53_record_www_website_fqdn" {
   description = "FQDN built using the zone domain and name."
-  value       = var.create_route53_website_records == true  ? aws_route53_record.www_website_record[0].fqdn : null
+  value       = var.create_route53_website_records == true ? aws_route53_record.www_website_record[0].fqdn : null
 }
 
 #------------------------------------------------------------------------------
