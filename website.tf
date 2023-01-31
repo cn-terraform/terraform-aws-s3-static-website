@@ -50,10 +50,10 @@ resource "aws_s3_bucket_cors_configuration" "website" {
     allowed_headers = var.website_cors_allowed_headers
     allowed_methods = var.website_cors_allowed_methods
     allowed_origins = concat(
-      ((var.cloudfront_viewer_protocol_policy == "allow-all") ? 
-        ["http://${var.website_domain_name}", "https://${var.website_domain_name}"] : 
-        ["https://${var.website_domain_name}"]), 
-      var.website_cors_additional_allowed_origins)
+      ((var.cloudfront_viewer_protocol_policy == "allow-all") ?
+        ["http://${var.website_domain_name}", "https://${var.website_domain_name}"] :
+      ["https://${var.website_domain_name}"]),
+    var.website_cors_additional_allowed_origins)
     expose_headers  = var.website_cors_expose_headers
     max_age_seconds = var.website_cors_max_age_seconds
   }
