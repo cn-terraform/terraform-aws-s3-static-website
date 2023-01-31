@@ -137,7 +137,7 @@ output "route_53_record_website_fqdn" {
 
 output "route_53_record_www_website_name" {
   description = "The name of the record."
-  value       = (var.var.www_website_redirect_enabled && var.create_route53_website_records) ? aws_route53_record.www_website_record[0].name : null
+  value       = (var.www_website_redirect_enabled && var.create_route53_website_records) ? aws_route53_record.www_website_record[0].name : null
 }
 
 output "route_53_record_www_website_fqdn" {
