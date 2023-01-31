@@ -121,6 +121,12 @@ variable "website_server_side_encryption_configuration" {
 #------------------------------------------------------------------------------
 # WWW Website for redirection to Website
 #------------------------------------------------------------------------------
+variable "www_website_redirect_enabled" {
+  description = "(Optional) Whether to redirect www subdomain. Defaults to true."
+  type        = bool
+  default     = true
+}
+
 variable "www_website_bucket_acl" {
   description = "(Optional) The canned ACL to apply. Valid values are private, public-read, public-read-write, aws-exec-read, authenticated-read, and log-delivery-write. Defaults to private."
   type        = string
