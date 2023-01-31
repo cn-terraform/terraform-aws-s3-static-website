@@ -37,6 +37,14 @@ output "website_bucket_tags_all" {
 }
 
 #------------------------------------------------------------------------------
+# Logs S3 Bucket
+#------------------------------------------------------------------------------
+output "website_logs_bucket_id" {
+  description = "The name of the bucket which holds the access logs"
+  value       = module.s3_logs_bucket.s3_bucket_id
+}
+
+#------------------------------------------------------------------------------
 # Cloudfront for S3 Bucket Website
 #------------------------------------------------------------------------------
 output "cloudfront_website_id" {
