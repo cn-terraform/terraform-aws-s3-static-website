@@ -36,14 +36,12 @@ output "website_bucket_tags_all" {
   value       = aws_s3_bucket.website.tags_all
 }
 
-output "website_bucket_website_endpoint" {
-  description = "The website endpoint, if the bucket is configured with a website. If not, this will be an empty string."
-  value       = aws_s3_bucket.website.website_endpoint
-}
-
-output "website_bucket_website_domain" {
-  description = "The domain of the website endpoint, if the bucket is configured with a website. If not, this will be an empty string. This is used to create Route 53 alias records."
-  value       = aws_s3_bucket.website.website_domain
+#------------------------------------------------------------------------------
+# Logs S3 Bucket
+#------------------------------------------------------------------------------
+output "website_logs_bucket_id" {
+  description = "The name of the bucket which holds the access logs"
+  value       = module.s3_logs_bucket.s3_bucket_id
 }
 
 #------------------------------------------------------------------------------
@@ -139,12 +137,12 @@ output "route_53_record_website_fqdn" {
 
 output "route_53_record_www_website_name" {
   description = "The name of the record."
-  value       = var.create_route53_website_records == true ? aws_route53_record.www_website_record[0].name : null
+  value       = (var.www_website_redirect_enabled && var.create_route53_website_records) ? aws_route53_record.www_website_record[0].name : null
 }
 
 output "route_53_record_www_website_fqdn" {
   description = "FQDN built using the zone domain and name."
-  value       = var.create_route53_website_records == true ? aws_route53_record.www_website_record[0].fqdn : null
+  value       = (var.www_website_redirect_enabled && var.create_route53_website_records) ? aws_route53_record.www_website_record[0].fqdn : null
 }
 
 #------------------------------------------------------------------------------

@@ -49,7 +49,11 @@ resource "aws_s3_bucket_cors_configuration" "website" {
   cors_rule {
     allowed_headers = var.website_cors_allowed_headers
     allowed_methods = var.website_cors_allowed_methods
-    allowed_origins = concat(["http://${var.website_domain_name}", "https://${var.website_domain_name}"], var.website_cors_additional_allowed_origins)
+    allowed_origins = concat(
+      ((var.cloudfront_viewer_protocol_policy == "allow-all") ? 
+        ["http://${var.website_domain_name}", "https://${var.website_domain_name}"] : 
+        ["https://${var.website_domain_name}"]), 
+      var.website_cors_additional_allowed_origins)
     expose_headers  = var.website_cors_expose_headers
     max_age_seconds = var.website_cors_max_age_seconds
   }
@@ -61,20 +65,6 @@ resource "aws_s3_bucket_logging" "website" {
   bucket        = aws_s3_bucket.website.id
   target_bucket = module.s3_logs_bucket.s3_bucket_id
   target_prefix = "website/"
-}
-
-resource "aws_s3_bucket_website_configuration" "website" {
-  provider = aws.main
-
-  bucket = aws_s3_bucket.website.id
-
-  index_document {
-    suffix = var.website_index_document
-  }
-
-  error_document {
-    key = var.website_error_document
-  }
 }
 
 resource "aws_s3_bucket_acl" "website" {
@@ -136,10 +126,10 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "website_bucket_we
 resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
   provider = aws.main
 
-  aliases = [
+  aliases = var.www_website_redirect_enabled ? [
     local.website_bucket_name,
     local.www_website_bucket_name
-  ]
+  ] : [local.website_bucket_name]
 
   web_acl_id = var.cloudfront_web_acl_id
 
@@ -249,7 +239,7 @@ resource "aws_route53_record" "website_cloudfront_record" {
 resource "aws_route53_record" "www_website_record" {
   provider = aws.main
 
-  count = var.create_route53_website_records ? 1 : 0
+  count = (var.www_website_redirect_enabled && var.create_route53_website_records) ? 1 : 0
 
   zone_id = var.create_route53_hosted_zone ? aws_route53_zone.hosted_zone[0].zone_id : var.route53_hosted_zone_id
   name    = local.www_website_bucket_name
