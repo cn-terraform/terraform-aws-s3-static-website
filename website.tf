@@ -78,7 +78,7 @@ resource "aws_s3_bucket_ownership_controls" "website" {
 
 resource "aws_s3_bucket_acl" "website" {
   depends_on = [aws_s3_bucket_ownership_controls.website]
-  provider = aws.main
+  provider   = aws.main
 
   bucket = aws_s3_bucket.website.id
   acl    = var.website_bucket_acl
