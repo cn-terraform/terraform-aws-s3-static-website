@@ -246,6 +246,22 @@ resource "aws_route53_record" "website_cloudfront_record" {
   }
 }
 
+resource "aws_route53_record" "website_cloudfront_record_ipv6" {
+  provider = aws.main
+
+  count = (var.is_ipv6_enabled && var.create_route53_website_records) ? 1 : 0
+
+  zone_id = var.create_route53_hosted_zone ? aws_route53_zone.hosted_zone[0].zone_id : var.route53_hosted_zone_id
+  name    = local.website_bucket_name
+  type    = "AAAA"
+
+  alias {
+    name                   = aws_cloudfront_distribution.website.domain_name
+    zone_id                = aws_cloudfront_distribution.website.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
 resource "aws_route53_record" "www_website_record" {
   provider = aws.main
 
@@ -254,6 +270,22 @@ resource "aws_route53_record" "www_website_record" {
   zone_id = var.create_route53_hosted_zone ? aws_route53_zone.hosted_zone[0].zone_id : var.route53_hosted_zone_id
   name    = local.www_website_bucket_name
   type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.website.domain_name
+    zone_id                = aws_cloudfront_distribution.website.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "www_website_record_ipv6" {
+  provider = aws.main
+
+  count = (var.is_ipv6_enabled && var.www_website_redirect_enabled && var.create_route53_website_records) ? 1 : 0
+
+  zone_id = var.create_route53_hosted_zone ? aws_route53_zone.hosted_zone[0].zone_id : var.route53_hosted_zone_id
+  name    = local.www_website_bucket_name
+  type    = "AAAA"
 
   alias {
     name                   = aws_cloudfront_distribution.website.domain_name
