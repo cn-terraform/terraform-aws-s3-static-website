@@ -11,7 +11,8 @@ resource "aws_cloudfront_origin_access_identity" "cf_oai" {
 # Website S3 Bucket
 #------------------------------------------------------------------------------
 #tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging
-resource "aws_s3_bucket" "website" { # tfsec:ignore:AWS017
+resource "aws_s3_bucket" "website" {
+  # tfsec:ignore:AWS017
   provider = aws.main
 
   bucket        = local.website_bucket_name
@@ -133,7 +134,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "website_bucket_we
 #------------------------------------------------------------------------------
 # tfsec issues ignored
 #  - AWS045: Enable WAF for the CloudFront distribution. Pending to implement.
-resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
+resource "aws_cloudfront_distribution" "website" {
+  # tfsec:ignore:AWS045
   provider = aws.main
 
   aliases = var.www_website_redirect_enabled ? [
@@ -191,21 +193,21 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
   dynamic "ordered_cache_behavior" {
     for_each = var.cloudfront_ordered_cache_behaviors
     content {
-      allowed_methods        = tolist(ordered_cache_behavior.value.allowed_methods)
-      cached_methods         = tolist(ordered_cache_behavior.value.cached_methods)
-      cache_policy_id = ordered_cache_behavior.value.cache_policy_id
-      compress = ordered_cache_behavior.value.compress
-      default_ttl = ordered_cache_behavior.value.default_ttl
-      field_level_encryption_id = ordered_cache_behavior.value.field_level_encryption_id
-      max_ttl = ordered_cache_behavior.value.max_ttl
-      min_ttl = ordered_cache_behavior.value.min_ttl
-      origin_request_policy_id = ordered_cache_behavior.value.origin_request_policy_id
-      path_pattern           = ordered_cache_behavior.value.path_pattern
-      realtime_log_config_arn = ordered_cache_behavior.value.realtime_log_config_arn
+      allowed_methods            = tolist(ordered_cache_behavior.value.allowed_methods)
+      cached_methods             = tolist(ordered_cache_behavior.value.cached_methods)
+      cache_policy_id            = ordered_cache_behavior.value.cache_policy_id
+      compress                   = ordered_cache_behavior.value.compress
+      default_ttl                = ordered_cache_behavior.value.default_ttl
+      field_level_encryption_id  = ordered_cache_behavior.value.field_level_encryption_id
+      max_ttl                    = ordered_cache_behavior.value.max_ttl
+      min_ttl                    = ordered_cache_behavior.value.min_ttl
+      origin_request_policy_id   = ordered_cache_behavior.value.origin_request_policy_id
+      path_pattern               = ordered_cache_behavior.value.path_pattern
+      realtime_log_config_arn    = ordered_cache_behavior.value.realtime_log_config_arn
       response_headers_policy_id = ordered_cache_behavior.value.response_headers_policy_id
-      smooth_streaming = ordered_cache_behavior.value.smooth_streaming
-      target_origin_id       = ordered_cache_behavior.value.target_origin_id
-      viewer_protocol_policy = ordered_cache_behavior.value.viewer_protocol_policy
+      smooth_streaming           = ordered_cache_behavior.value.smooth_streaming
+      target_origin_id           = ordered_cache_behavior.value.target_origin_id
+      viewer_protocol_policy     = ordered_cache_behavior.value.viewer_protocol_policy
     }
   }
 
@@ -226,21 +228,23 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
       domain_name = origin.value.domain_name
 
       dynamic "custom_header" {
-        for_each = origin.value.custom_header == null ? [] : [ for h in origin.value.custom_header : {
-          name = h.name
-          value = h.value
-        } ]
+        for_each = origin.value.custom_header == null ? [] : [
+          for h in origin.value.custom_header : {
+            name  = h.name
+            value = h.value
+          }
+        ]
         content {
-          name = custom_header.value.name
+          name  = custom_header.value.name
           value = custom_header.value.value
         }
       }
 
-      origin_id = origin.value.origin_id
-      connection_attempts = origin.value.connection_attempts
-      connection_timeout = origin.value.connection_timeout
+      origin_id                = origin.value.origin_id
+      connection_attempts      = origin.value.connection_attempts
+      connection_timeout       = origin.value.connection_timeout
       origin_access_control_id = origin.value.origin_access_control_id
-      origin_path = origin.value.origin_path
+      origin_path              = origin.value.origin_path
 
       dynamic "s3_origin_config" {
         for_each = origin.value.s3_origin_config[*]
@@ -252,12 +256,12 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
       dynamic "custom_origin_config" {
         for_each = origin.value.custom_origin_config[*]
         content {
-          http_port              = custom_origin_config.value.http_port
-          https_port             = custom_origin_config.value.https_port
-          origin_protocol_policy = custom_origin_config.value.origin_protocol_policy
-          origin_ssl_protocols = custom_origin_config.value.origin_ssl_protocols
+          http_port                = custom_origin_config.value.http_port
+          https_port               = custom_origin_config.value.https_port
+          origin_protocol_policy   = custom_origin_config.value.origin_protocol_policy
+          origin_ssl_protocols     = custom_origin_config.value.origin_ssl_protocols
           origin_keepalive_timeout = custom_origin_config.value.origin_keepalive_timeout
-          origin_read_timeout = custom_origin_config.value.origin_read_timeout
+          origin_read_timeout      = custom_origin_config.value.origin_read_timeout
         }
       }
     }
