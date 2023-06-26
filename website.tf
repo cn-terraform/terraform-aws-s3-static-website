@@ -188,14 +188,78 @@ resource "aws_cloudfront_distribution" "website" { # tfsec:ignore:AWS045
     prefix          = "cloudfront_website"
   }
 
-  # TODO - Add variable to support ordered_cache_behavior
-  # ordered_cache_behavior (Optional) - An ordered list of cache behaviors resource for this distribution. List from top to bottom in order of precedence. The topmost cache behavior will have precedence 0.
+  dynamic "ordered_cache_behavior" {
+    for_each = var.cloudfront_ordered_cache_behaviors
+    content {
+      allowed_methods        = tolist(ordered_cache_behavior.value.allowed_methods)
+      cached_methods         = tolist(ordered_cache_behavior.value.cached_methods)
+      cache_policy_id = ordered_cache_behavior.value.cache_policy_id
+      compress = ordered_cache_behavior.value.compress
+      default_ttl = ordered_cache_behavior.value.default_ttl
+      field_level_encryption_id = ordered_cache_behavior.value.field_level_encryption_id
+      max_ttl = ordered_cache_behavior.value.max_ttl
+      min_ttl = ordered_cache_behavior.value.min_ttl
+      origin_request_policy_id = ordered_cache_behavior.value.origin_request_policy_id
+      path_pattern           = ordered_cache_behavior.value.path_pattern
+      realtime_log_config_arn = ordered_cache_behavior.value.realtime_log_config_arn
+      response_headers_policy_id = ordered_cache_behavior.value.response_headers_policy_id
+      smooth_streaming = ordered_cache_behavior.value.smooth_streaming
+      target_origin_id       = ordered_cache_behavior.value.target_origin_id
+      viewer_protocol_policy = ordered_cache_behavior.value.viewer_protocol_policy
+    }
+  }
+
+  # TODO support origin groups
+  # origin_group (Optional) - One or more origin_group for this distribution (multiples allowed).
 
   origin {
     domain_name = aws_s3_bucket.website.bucket_regional_domain_name
     origin_id   = local.website_bucket_name
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.cf_oai.cloudfront_access_identity_path
+    }
+  }
+
+  dynamic "origin" {
+    for_each = var.cloudfront_additional_origins
+    content {
+      domain_name = origin.value.domain_name
+
+      dynamic "custom_header" {
+        for_each = origin.value.custom_header == null ? [] : [ for h in origin.value.custom_header : {
+          name = h.name
+          value = h.value
+        } ]
+        content {
+          name = custom_header.value.name
+          value = custom_header.value.value
+        }
+      }
+
+      origin_id = origin.value.origin_id
+      connection_attempts = origin.value.connection_attempts
+      connection_timeout = origin.value.connection_timeout
+      origin_access_control_id = origin.value.origin_access_control_id
+      origin_path = origin.value.origin_path
+
+      dynamic "s3_origin_config" {
+        for_each = origin.value.s3_origin_config[*]
+        content {
+          origin_access_identity = s3_origin_config.value.origin_access_identity
+        }
+      }
+
+      dynamic "custom_origin_config" {
+        for_each = origin.value.custom_origin_config[*]
+        content {
+          http_port              = custom_origin_config.value.http_port
+          https_port             = custom_origin_config.value.https_port
+          origin_protocol_policy = custom_origin_config.value.origin_protocol_policy
+          origin_ssl_protocols = custom_origin_config.value.origin_ssl_protocols
+          origin_keepalive_timeout = custom_origin_config.value.origin_keepalive_timeout
+          origin_read_timeout = custom_origin_config.value.origin_read_timeout
+        }
+      }
     }
   }
 
