@@ -204,6 +204,62 @@ variable "cloudfront_custom_error_responses" {
   default = []
 }
 
+variable "cloudfront_ordered_cache_behaviors" {
+  description = "A list of custom ordered cache behaviors"
+  type = list(object({
+    allowed_methods           = list(string)
+    cached_methods            = list(string)
+    cache_policy_id           = string
+    compress                  = optional(bool)
+    default_ttl               = optional(number)
+    field_level_encryption_id = optional(string)
+    # forwarded_values will not be supported as Hashicorp had already deprecated it at the time of implementing this module
+    # TODO support lambda_function_association and function_association
+    max_ttl                    = optional(number)
+    min_ttl                    = optional(number)
+    origin_request_policy_id   = string
+    path_pattern               = optional(string)
+    realtime_log_config_arn    = optional(string)
+    response_headers_policy_id = optional(string)
+    smooth_streaming           = optional(bool)
+    target_origin_id           = string
+    # TODO support trusted_key_groups and trusted_signers
+    viewer_protocol_policy = string
+  }))
+  default = []
+}
+
+variable "cloudfront_additional_origins" {
+  description = "(Optional) A list of additional origins besides the web site"
+  type = list(object({
+    connection_attempts = optional(number)
+    connection_timeout  = optional(number)
+    custom_origin_config = optional(object({
+      http_port                = number
+      https_port               = number
+      origin_protocol_policy   = string
+      origin_ssl_protocols     = list(string)
+      origin_keepalive_timeout = optional(number)
+      origin_read_timeout      = optional(number)
+    }))
+    domain_name = string
+    custom_header : optional(list(
+      object({
+        name  = string
+        value = string
+      }))
+    )
+    origin_access_control_id = optional(string)
+    origin_id                = string
+    origin_path              = optional(string)
+    # TODO support origin_shield
+    s3_origin_config = optional(object({
+      origin_access_identity = string
+    }))
+  }))
+  default = []
+}
+
 variable "cloudfront_web_acl_id" {
   description = "(Optional) A unique identifier that specifies the AWS WAF web ACL, if any, to associate with this distribution."
   type        = string
