@@ -28,7 +28,7 @@ jobs:
     container: hashicorp/terraform
     strategy:
       matrix: {
-        dir: ['examples/complete', 'examples/no-cert', 'examples/no-cert-no-hosted-zone', 'examples/no-hosted-zone']
+        dir: ['examples/complete', 'examples/no-cert', 'examples/no-cert-no-hosted-zone', 'examples/no-hosted-zone', 'examples/ordered-cache-behavior']
       }
     steps:
       - name: Checkout repository
@@ -45,7 +45,7 @@ jobs:
     container: hashicorp/terraform
     strategy:
       matrix: {
-        dir: ['examples/complete', 'examples/no-cert', 'examples/no-cert-no-hosted-zone', 'examples/no-hosted-zone']
+        dir: ['examples/complete', 'examples/no-cert', 'examples/no-cert-no-hosted-zone', 'examples/no-hosted-zone', 'examples/ordered-cache-behavior']
       }
     services:
       localstack:
@@ -69,7 +69,7 @@ jobs:
     name: Show infracost diff
     strategy:
       matrix: {
-        dir: ['examples/complete', 'examples/no-cert', 'examples/no-cert-no-hosted-zone', 'examples/no-hosted-zone']
+        dir: ['examples/complete', 'examples/no-cert', 'examples/no-cert-no-hosted-zone', 'examples/no-hosted-zone', 'examples/ordered-cache-behavior']
       }
     steps:
       - name: Check out repository
