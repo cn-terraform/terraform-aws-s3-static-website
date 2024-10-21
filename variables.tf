@@ -193,6 +193,16 @@ variable "cloudfront_function_association" {
   default = []
 }
 
+variable "cloudfront_lambda_function_association" {
+  description = "(Optional - up to 2 per distribution) List containing information to associate a CF lambda_function to cloudfront. The first field is `event_type` of the CF function associated with default cache behavior, it can be origin-request or origin-response"
+  type = list(object({
+    event_type   = string
+    lambda_arn = string
+    include_body = bool
+  }))
+  default = []
+}
+
 variable "cloudfront_custom_error_responses" {
   description = "A list of custom error responses"
   type = list(object({
