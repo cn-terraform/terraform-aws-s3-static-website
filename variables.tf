@@ -202,7 +202,7 @@ variable "cloudfront_lambda_function_association" {
   }))
   default = []
   validation {
-    condition     = length(var.cloudfront_lambda_function_association) >= 2
+    condition     = length(var.cloudfront_lambda_function_association) <= 2
     error_message = "Only up to 2 cloudfront_lambda_function_associations are allowed"
   }
 }
