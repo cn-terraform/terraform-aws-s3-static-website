@@ -167,6 +167,14 @@ resource "aws_cloudfront_distribution" "website" {
         function_arn = function_association.value.function_arn
       }
     }
+    dynamic "lambda_function_association" {
+      for_each = var.cloudfront_lambda_function_association
+      content {
+        event_type   = lambda_function_association.value.event_type
+        lambda_arn   = lambda_function_association.value.lambda_arn
+        include_body = lambda_function_association.value.include_body
+      }
+    }
   }
 
   dynamic "custom_error_response" {
