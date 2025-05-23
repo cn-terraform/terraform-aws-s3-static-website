@@ -228,7 +228,11 @@ variable "cloudfront_ordered_cache_behaviors" {
     default_ttl               = optional(number)
     field_level_encryption_id = optional(string)
     # forwarded_values will not be supported as Hashicorp had already deprecated it at the time of implementing this module
-    # TODO support lambda_function_association and function_association
+    function_association = optional(list(object({
+      event_type   = string
+      function_arn = string
+    })), [])
+    # TODO support lambda_function_association
     max_ttl                    = optional(number)
     min_ttl                    = optional(number)
     origin_request_policy_id   = string
