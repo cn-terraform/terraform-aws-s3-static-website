@@ -216,6 +216,13 @@ resource "aws_cloudfront_distribution" "website" {
       smooth_streaming           = ordered_cache_behavior.value.smooth_streaming
       target_origin_id           = ordered_cache_behavior.value.target_origin_id
       viewer_protocol_policy     = ordered_cache_behavior.value.viewer_protocol_policy
+      dynamic "function_association" {
+        for_each = ordered_cache_behavior.value.function_association
+        content {
+          event_type   = function_association.value.event_type
+          function_arn = function_association.value.function_arn
+        }
+      }
     }
   }
 
