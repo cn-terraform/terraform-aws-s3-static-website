@@ -184,6 +184,18 @@ variable "cloudfront_enable_compression" {
   default     = false
 }
 
+variable "cloudfront_default_cache_policy_id" {
+  description = "(Optional) The cache policy ID for the default cache behavior. Defaults to Managed-CachingOptimized (658327ea-f89d-4fab-a63d-7e88639e58f6). Use 4135ea2d-6df8-44a3-9df3-4b5a84be39ad for Managed-CachingDisabled."
+  type        = string
+  default     = "658327ea-f89d-4fab-a63d-7e88639e58f6"
+}
+
+variable "cloudfront_default_origin_request_policy_id" {
+  description = "(Optional) The origin request policy ID for the default cache behavior. Defaults to Managed-CORS-S3Origin (88a5eaf4-2fd4-4709-b370-b4c650ea3fcf)."
+  type        = string
+  default     = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf"
+}
+
 variable "cloudfront_function_association" {
   description = "(Optional - up to 2 per distribution) List containing information to associate a CF function to cloudfront. The first field is `event_type` of the CF function associated with default cache behavior, it can be viewer-request or viewer-response"
   type = list(object({
