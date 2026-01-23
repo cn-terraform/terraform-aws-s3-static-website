@@ -118,6 +118,12 @@ variable "website_server_side_encryption_configuration" {
   default     = {}
 }
 
+variable "website_bucket_policy" {
+  description = "(Optional) Map containing the IAM policy for the website bucket. Defaults to null and the policy will be generated automatically."
+  type        = any
+  default     = null
+}
+
 #------------------------------------------------------------------------------
 # WWW Website for redirection to Website
 #------------------------------------------------------------------------------
