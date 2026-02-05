@@ -89,7 +89,7 @@ resource "aws_s3_bucket_policy" "website" {
   provider = aws.main
 
   bucket = aws_s3_bucket.website.id
-  policy = templatefile("${path.module}/templates/s3_website_bucket_policy.json", {
+  policy = var.website_bucket_policy != null ? jsonencode(var.website_bucket_policy) : templatefile("${path.module}/templates/s3_website_bucket_policy.json", {
     bucket_name = local.website_bucket_name
     cf_oai_arn  = aws_cloudfront_origin_access_identity.cf_oai.iam_arn
   })
