@@ -119,7 +119,7 @@ variable "website_server_side_encryption_configuration" {
 }
 
 variable "website_bucket_policy" {
-  description = "(Optional) Map containing the IAM policy for the website bucket. Defaults to null and the policy will be generated automatically."
+  description = "(Optional) Map containing the IAM policy for the website bucket. Defaults to null and the policy will be generated automatically. See examples/custom-website-bucket-policy/main.tf for configuration example."
   type        = any
   default     = null
 }

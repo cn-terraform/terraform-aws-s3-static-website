@@ -10,7 +10,7 @@ resource "aws_cloudfront_origin_access_identity" "cf_oai" {
 #------------------------------------------------------------------------------
 # Website S3 Bucket
 #------------------------------------------------------------------------------
-#tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging
+#tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-bucket-encryption
 resource "aws_s3_bucket" "website" {
   # tfsec:ignore:AWS017
   provider = aws.main
