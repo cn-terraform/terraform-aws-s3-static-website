@@ -1,67 +1,71 @@
-#------------------------------------------------------------------------------
-# Locals
-#------------------------------------------------------------------------------
-locals {
-  website_bucket_name     = var.website_domain_name
-  www_website_bucket_name = "www.${var.website_domain_name}"
-}
-
-#------------------------------------------------------------------------------
-# S3 BUCKET - For access logs
-#------------------------------------------------------------------------------
-#tfsec:ignore:aws-s3-enable-versioning
+####################
+# Access logs bucket
+####################
 module "s3_logs_bucket" {
   providers = {
     aws = aws.main
   }
 
   source  = "cn-terraform/logs-s3-bucket/aws"
-  version = "1.0.7"
+  version = "2.0.0"
   # source  = "../terraform-aws-logs-s3-bucket"
 
-  name_prefix                   = "${var.name_prefix}-log-bucket"
-  aws_principals_identifiers    = formatlist("arn:aws:iam::%s:root", var.aws_accounts_with_read_view_log_bucket)
-  block_s3_bucket_public_access = true
-  s3_bucket_force_destroy       = var.log_bucket_force_destroy
-  # enable_s3_bucket_server_side_encryption        = var.enable_s3_bucket_server_side_encryption
-  # s3_bucket_server_side_encryption_sse_algorithm = var.s3_bucket_server_side_encryption_sse_algorithm
-  # s3_bucket_server_side_encryption_key           = var.s3_bucket_server_side_encryption_key
+  bucket_name         = format("%s-log-bucket", var.name_prefix)
+  force_destroy       = false
+  object_lock_enabled = false
+  tags                = {}
 
-  tags = merge({
-    Name = "${var.name_prefix}-logs"
-  }, var.tags)
+  log_delivery_principals = [
+    "logging.s3.amazonaws.com"
+  ]
+
+  bucket_server_side_encryption = {
+    kms_master_key_id : null,
+    sse_algorithm : "AES256"
+  }
+
+  bucket_versioning = {
+    mfa_delete : "Enabled",
+    status : "Enabled"
+  }
 }
 
-#------------------------------------------------------------------------------
+#####################
 # Route53 Hosted Zone
-#------------------------------------------------------------------------------
+#####################
 resource "aws_route53_zone" "hosted_zone" {
   provider = aws.main
 
   count = var.create_route53_hosted_zone ? 1 : 0
 
-  name = var.website_domain_name
-  tags = merge({
-    Name = "${var.name_prefix}-hosted-zone"
-  }, var.tags)
+  name = var.website_settings.domain_name
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.name_prefix}-hosted-zone"
+    }
+  )
 }
 
-#------------------------------------------------------------------------------
+#################
 # ACM Certificate
-#------------------------------------------------------------------------------
+#################
 resource "aws_acm_certificate" "cert" {
   provider = aws.acm_provider
 
   count = var.create_acm_certificate ? 1 : 0
 
-  domain_name               = "*.${var.website_domain_name}"
-  subject_alternative_names = [var.website_domain_name]
+  domain_name               = "*.${var.website_settings.domain_name}"
+  subject_alternative_names = [var.website_settings.domain_name]
 
   validation_method = "DNS"
 
-  tags = merge({
-    Name = var.website_domain_name
-  }, var.tags)
+  tags = merge(
+    var.tags,
+    {
+      Name = var.website_settings.domain_name
+    }
+  )
 
   lifecycle {
     create_before_destroy = true

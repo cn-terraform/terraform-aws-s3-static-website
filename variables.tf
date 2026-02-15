@@ -1,6 +1,6 @@
-#------------------------------------------------------------------------------
+######
 # Misc
-#------------------------------------------------------------------------------
+######
 variable "name_prefix" {
   description = "Name prefix for resources on AWS"
 }
@@ -11,51 +11,46 @@ variable "tags" {
   default     = {}
 }
 
-#------------------------------------------------------------------------------
-# Log Bucket
-#------------------------------------------------------------------------------
-variable "log_bucket_versioning_status" {
-  description = "(Optional) The versioning state of the bucket. Valid values: Enabled or Suspended. Defaults to Enabled"
-  type        = string
-  default     = "Enabled"
-}
-
-variable "log_bucket_versioning_mfa_delete" {
-  description = "(Optional) Specifies whether MFA delete is enabled in the bucket versioning configuration. Valid values: Enabled or Disabled. Defaults to Disabled"
-  type        = string
-  default     = "Disabled"
-}
-
-variable "log_bucket_force_destroy" {
-  description = "(Optional, Default:false) A boolean that indicates all objects (including any locked objects) should be deleted from the log bucket so that the bucket can be destroyed without error. These objects are not recoverable."
-  type        = bool
-  default     = false
-}
-
-variable "aws_accounts_with_read_view_log_bucket" {
-  description = "List of AWS accounts with read permissions to log bucket"
-  type        = list(string)
-  default     = []
-}
-
-#------------------------------------------------------------------------------
+#########
 # Website
-#------------------------------------------------------------------------------
-variable "website_domain_name" {
-  description = "The domain name to use for the website"
-  type        = string
+#########
+variable "website_settings" {
+  type = object({
+    domain_name                     = string
+    cors_allowed_headers            = optional(list(string), ["Authorization", "Content-Length"])
+    cors_allowed_methods            = optional(list(string), ["GET", "POST"])
+    cors_additional_allowed_origins = optional(list(string), [])
+    cors_expose_headers             = optional(list(string), [])
+    cors_max_age_seconds            = optional(number, 3600)
+  })
 }
 
-variable "website_bucket_acl" {
-  description = "(Optional) The canned ACL to apply. Valid values are private, public-read, public-read-write, aws-exec-read, authenticated-read, and log-delivery-write. Defaults to private."
-  type        = string
-  default     = "private"
-}
+variable "website_bucket" {
+  description = "value"
+  type = object({
+    acl                 = optional(string, "private")
+    force_destroy       = optional(bool, false)
+    object_lock_enabled = optional(bool, false)
+    versioning = object({
+      status     = optional(string, "Enabled")
+      mfa_delete = optional(string, "Enabled")
+    })
+  })
 
-variable "website_bucket_force_destroy" {
-  description = "(Optional, Default:false) A boolean that indicates all objects (including any locked objects) should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable."
-  type        = bool
-  default     = false
+  validation {
+    condition     = contains(["Enabled", "Suspended", "Disabled"], var.website_bucket.versioning.status)
+    error_message = "The website bucket versioning status variable can one be one of Enabled, Suspended, or Disabled."
+  }
+
+  validation {
+    condition     = contains(["Enabled", "Disabled"], var.website_bucket.versioning.mfa_delete)
+    error_message = "The website bucket versioning MFA delete variable can one be one of Enabled or Disabled."
+  }
+
+  validation {
+    condition     = contains(["private", "public-read", "public-read-write", "aws-exec-read", "authenticated-read", "bucket-owner-read", "bucket-owner-full-control", "log-delivery-write"], var.website_bucket.acl)
+    error_message = "The acl value for the website S3 bucket can be one of private, public-read, public-read-write, aws-exec-read, authenticated-read, bucket-owner-read, bucket-owner-full-control or log-delivery-write."
+  }
 }
 
 variable "website_index_document" {
@@ -68,48 +63,6 @@ variable "website_error_document" {
   description = "(Optional) An absolute path to the document to return in case of a 4XX error. Defaults to 404.html"
   type        = string
   default     = "404.html"
-}
-
-variable "website_cors_allowed_headers" {
-  description = "(Optional) Specifies which headers are allowed. Defaults to Authorization and Content-Length"
-  type        = list(string)
-  default     = ["Authorization", "Content-Length"]
-}
-
-variable "website_cors_allowed_methods" {
-  description = "(Optional) Specifies which methods are allowed. Can be GET, PUT, POST, DELETE or HEAD. Defaults to GET and POST"
-  type        = list(string)
-  default     = ["GET", "POST"]
-}
-
-variable "website_cors_additional_allowed_origins" {
-  description = "(Optional) Specifies which origins are allowed besides the domain name specified"
-  type        = list(string)
-  default     = []
-}
-
-variable "website_cors_expose_headers" {
-  description = "(Optional) Specifies expose header in the response."
-  type        = list(string)
-  default     = []
-}
-
-variable "website_cors_max_age_seconds" {
-  description = "(Optional) Specifies time in seconds that browser can cache the response for a preflight request. Defaults to 3600"
-  type        = number
-  default     = 3600
-}
-
-variable "website_versioning_status" {
-  description = "(Optional) The versioning state of the bucket. Valid values: Enabled or Suspended. Defaults to Enabled"
-  type        = string
-  default     = "Enabled"
-}
-
-variable "website_versioning_mfa_delete" {
-  description = "(Optional) Specifies whether MFA delete is enabled in the bucket versioning configuration. Valid values: Enabled or Disabled. Defaults to Disabled"
-  type        = string
-  default     = "Disabled"
 }
 
 variable "website_server_side_encryption_configuration" {
@@ -131,30 +84,6 @@ variable "www_website_redirect_enabled" {
   description = "(Optional) Whether to redirect www subdomain. Defaults to true."
   type        = bool
   default     = true
-}
-
-variable "www_website_bucket_acl" {
-  description = "(Optional) The canned ACL to apply. Valid values are private, public-read, public-read-write, aws-exec-read, authenticated-read, and log-delivery-write. Defaults to private."
-  type        = string
-  default     = "private"
-}
-
-variable "www_website_bucket_force_destroy" {
-  description = "(Optional, Default:false) A boolean that indicates all objects (including any locked objects) should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable."
-  type        = bool
-  default     = false
-}
-
-variable "www_website_versioning_enabled" {
-  description = "(Optional) Enable versioning. Once you version-enable a bucket, it can never return to an unversioned state. You can, however, suspend versioning on that bucket. Defaults to true"
-  type        = bool
-  default     = true
-}
-
-variable "www_website_versioning_mfa_delete" {
-  description = "(Optional) Enable MFA delete for either change the versioning state of your bucket or permanently delete an object version. Default is false. This cannot be used to toggle this setting but is available to allow managed buckets to reflect the state in AWS."
-  type        = bool
-  default     = false
 }
 
 #------------------------------------------------------------------------------

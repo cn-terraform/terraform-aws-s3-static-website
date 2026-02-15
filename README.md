@@ -30,26 +30,26 @@ In order to run all checks at any point run the following command:
 
         pre-commit run --all-files
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.5 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~>6 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws.acm_provider"></a> [aws.acm\_provider](#provider\_aws.acm\_provider) | >= 4.0 |
-| <a name="provider_aws.main"></a> [aws.main](#provider\_aws.main) | >= 4.0 |
+| <a name="provider_aws.acm_provider"></a> [aws.acm\_provider](#provider\_aws.acm\_provider) | 6.31.0 |
+| <a name="provider_aws.main"></a> [aws.main](#provider\_aws.main) | 6.31.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_s3_logs_bucket"></a> [s3\_logs\_bucket](#module\_s3\_logs\_bucket) | cn-terraform/logs-s3-bucket/aws | 1.0.7 |
+| <a name="module_s3_logs_bucket"></a> [s3\_logs\_bucket](#module\_s3\_logs\_bucket) | cn-terraform/logs-s3-bucket/aws | 2.0.0 |
 
 ## Resources
 
@@ -71,8 +71,8 @@ In order to run all checks at any point run the following command:
 | [aws_s3_bucket_logging.website](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_logging) | resource |
 | [aws_s3_bucket_ownership_controls.website](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_ownership_controls) | resource |
 | [aws_s3_bucket_policy.website](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_policy) | resource |
-| [aws_s3_bucket_public_access_block.website_bucket_public_access_block](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
-| [aws_s3_bucket_server_side_encryption_configuration.website_bucket_website_server_side_encryption_configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_server_side_encryption_configuration) | resource |
+| [aws_s3_bucket_public_access_block.website](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
+| [aws_s3_bucket_server_side_encryption_configuration.website](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_server_side_encryption_configuration) | resource |
 | [aws_s3_bucket_versioning.website](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_versioning) | resource |
 
 ## Inputs
@@ -80,7 +80,6 @@ In order to run all checks at any point run the following command:
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_acm_certificate_arn_to_use"></a> [acm\_certificate\_arn\_to\_use](#input\_acm\_certificate\_arn\_to\_use) | ACM Certificate ARN to use in case you disable automatic certificate creation. Certificate must be in us-east-1 region. | `string` | `""` | no |
-| <a name="input_aws_accounts_with_read_view_log_bucket"></a> [aws\_accounts\_with\_read\_view\_log\_bucket](#input\_aws\_accounts\_with\_read\_view\_log\_bucket) | List of AWS accounts with read permissions to log bucket | `list(string)` | `[]` | no |
 | <a name="input_cloudfront_additional_origins"></a> [cloudfront\_additional\_origins](#input\_cloudfront\_additional\_origins) | (Optional) A list of additional origins besides the web site | <pre>list(object({<br/>    connection_attempts = optional(number)<br/>    connection_timeout  = optional(number)<br/>    custom_origin_config = optional(object({<br/>      http_port                = number<br/>      https_port               = number<br/>      origin_protocol_policy   = string<br/>      origin_ssl_protocols     = list(string)<br/>      origin_keepalive_timeout = optional(number)<br/>      origin_read_timeout      = optional(number)<br/>    }))<br/>    domain_name = string<br/>    custom_header : optional(list(<br/>      object({<br/>        name  = string<br/>        value = string<br/>      }))<br/>    )<br/>    origin_access_control_id = optional(string)<br/>    origin_id                = string<br/>    origin_path              = optional(string)<br/>    # TODO support origin_shield<br/>    s3_origin_config = optional(object({<br/>      origin_access_identity = string<br/>    }))<br/>  }))</pre> | `[]` | no |
 | <a name="input_cloudfront_allowed_cached_methods"></a> [cloudfront\_allowed\_cached\_methods](#input\_cloudfront\_allowed\_cached\_methods) | (Optional) Specifies which methods are allowed and cached by CloudFront. Can be GET, PUT, POST, DELETE or HEAD. Defaults to GET and HEAD | `list(string)` | <pre>[<br/>  "GET",<br/>  "HEAD"<br/>]</pre> | no |
 | <a name="input_cloudfront_custom_error_responses"></a> [cloudfront\_custom\_error\_responses](#input\_cloudfront\_custom\_error\_responses) | A list of custom error responses | <pre>list(object({<br/>    error_caching_min_ttl = number<br/>    error_code            = number<br/>    response_code         = number<br/>    response_page_path    = string<br/>  }))</pre> | `[]` | no |
@@ -104,31 +103,16 @@ In order to run all checks at any point run the following command:
 | <a name="input_create_route53_hosted_zone"></a> [create\_route53\_hosted\_zone](#input\_create\_route53\_hosted\_zone) | Enable or disable Route 53 hosted zone creation. If set to false, the variable route53\_hosted\_zone\_id is required. Defaults to true | `bool` | `true` | no |
 | <a name="input_create_route53_website_records"></a> [create\_route53\_website\_records](#input\_create\_route53\_website\_records) | Enable or disable creation of Route 53 records in the hosted zone. Defaults to true | `bool` | `true` | no |
 | <a name="input_is_ipv6_enabled"></a> [is\_ipv6\_enabled](#input\_is\_ipv6\_enabled) | (Optional) - Whether the IPv6 is enabled for the distribution. Defaults to true | `bool` | `true` | no |
-| <a name="input_log_bucket_force_destroy"></a> [log\_bucket\_force\_destroy](#input\_log\_bucket\_force\_destroy) | (Optional, Default:false) A boolean that indicates all objects (including any locked objects) should be deleted from the log bucket so that the bucket can be destroyed without error. These objects are not recoverable. | `bool` | `false` | no |
-| <a name="input_log_bucket_versioning_mfa_delete"></a> [log\_bucket\_versioning\_mfa\_delete](#input\_log\_bucket\_versioning\_mfa\_delete) | (Optional) Specifies whether MFA delete is enabled in the bucket versioning configuration. Valid values: Enabled or Disabled. Defaults to Disabled | `string` | `"Disabled"` | no |
-| <a name="input_log_bucket_versioning_status"></a> [log\_bucket\_versioning\_status](#input\_log\_bucket\_versioning\_status) | (Optional) The versioning state of the bucket. Valid values: Enabled or Suspended. Defaults to Enabled | `string` | `"Enabled"` | no |
 | <a name="input_name_prefix"></a> [name\_prefix](#input\_name\_prefix) | Name prefix for resources on AWS | `any` | n/a | yes |
 | <a name="input_route53_hosted_zone_id"></a> [route53\_hosted\_zone\_id](#input\_route53\_hosted\_zone\_id) | The Route 53 hosted zone ID to use if create\_route53\_hosted\_zone is false | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Resource tags | `map(string)` | `{}` | no |
-| <a name="input_website_bucket_acl"></a> [website\_bucket\_acl](#input\_website\_bucket\_acl) | (Optional) The canned ACL to apply. Valid values are private, public-read, public-read-write, aws-exec-read, authenticated-read, and log-delivery-write. Defaults to private. | `string` | `"private"` | no |
-| <a name="input_website_bucket_force_destroy"></a> [website\_bucket\_force\_destroy](#input\_website\_bucket\_force\_destroy) | (Optional, Default:false) A boolean that indicates all objects (including any locked objects) should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable. | `bool` | `false` | no |
+| <a name="input_website_bucket"></a> [website\_bucket](#input\_website\_bucket) | value | <pre>object({<br/>    acl                 = optional(string, "private")<br/>    force_destroy       = optional(bool, false)<br/>    object_lock_enabled = optional(bool, false)<br/>    versioning = object({<br/>      status     = optional(string, "Enabled")<br/>      mfa_delete = optional(string, "Enabled")<br/>    })<br/>  })</pre> | n/a | yes |
 | <a name="input_website_bucket_policy"></a> [website\_bucket\_policy](#input\_website\_bucket\_policy) | (Optional) Map containing the IAM policy for the website bucket. Defaults to null and the policy will be generated automatically. | `any` | `null` | no |
-| <a name="input_website_cors_additional_allowed_origins"></a> [website\_cors\_additional\_allowed\_origins](#input\_website\_cors\_additional\_allowed\_origins) | (Optional) Specifies which origins are allowed besides the domain name specified | `list(string)` | `[]` | no |
-| <a name="input_website_cors_allowed_headers"></a> [website\_cors\_allowed\_headers](#input\_website\_cors\_allowed\_headers) | (Optional) Specifies which headers are allowed. Defaults to Authorization and Content-Length | `list(string)` | <pre>[<br/>  "Authorization",<br/>  "Content-Length"<br/>]</pre> | no |
-| <a name="input_website_cors_allowed_methods"></a> [website\_cors\_allowed\_methods](#input\_website\_cors\_allowed\_methods) | (Optional) Specifies which methods are allowed. Can be GET, PUT, POST, DELETE or HEAD. Defaults to GET and POST | `list(string)` | <pre>[<br/>  "GET",<br/>  "POST"<br/>]</pre> | no |
-| <a name="input_website_cors_expose_headers"></a> [website\_cors\_expose\_headers](#input\_website\_cors\_expose\_headers) | (Optional) Specifies expose header in the response. | `list(string)` | `[]` | no |
-| <a name="input_website_cors_max_age_seconds"></a> [website\_cors\_max\_age\_seconds](#input\_website\_cors\_max\_age\_seconds) | (Optional) Specifies time in seconds that browser can cache the response for a preflight request. Defaults to 3600 | `number` | `3600` | no |
-| <a name="input_website_domain_name"></a> [website\_domain\_name](#input\_website\_domain\_name) | The domain name to use for the website | `string` | n/a | yes |
 | <a name="input_website_error_document"></a> [website\_error\_document](#input\_website\_error\_document) | (Optional) An absolute path to the document to return in case of a 4XX error. Defaults to 404.html | `string` | `"404.html"` | no |
 | <a name="input_website_index_document"></a> [website\_index\_document](#input\_website\_index\_document) | Amazon S3 returns this index document when requests are made to the root domain or any of the subfolders.  Defaults to index.html | `string` | `"index.html"` | no |
 | <a name="input_website_server_side_encryption_configuration"></a> [website\_server\_side\_encryption\_configuration](#input\_website\_server\_side\_encryption\_configuration) | (Optional) Map containing server-side encryption configuration for the website bucket. Defaults to no encryption. See examples/complete/main.tf for configuration example. | `any` | `{}` | no |
-| <a name="input_website_versioning_mfa_delete"></a> [website\_versioning\_mfa\_delete](#input\_website\_versioning\_mfa\_delete) | (Optional) Specifies whether MFA delete is enabled in the bucket versioning configuration. Valid values: Enabled or Disabled. Defaults to Disabled | `string` | `"Disabled"` | no |
-| <a name="input_website_versioning_status"></a> [website\_versioning\_status](#input\_website\_versioning\_status) | (Optional) The versioning state of the bucket. Valid values: Enabled or Suspended. Defaults to Enabled | `string` | `"Enabled"` | no |
-| <a name="input_www_website_bucket_acl"></a> [www\_website\_bucket\_acl](#input\_www\_website\_bucket\_acl) | (Optional) The canned ACL to apply. Valid values are private, public-read, public-read-write, aws-exec-read, authenticated-read, and log-delivery-write. Defaults to private. | `string` | `"private"` | no |
-| <a name="input_www_website_bucket_force_destroy"></a> [www\_website\_bucket\_force\_destroy](#input\_www\_website\_bucket\_force\_destroy) | (Optional, Default:false) A boolean that indicates all objects (including any locked objects) should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable. | `bool` | `false` | no |
+| <a name="input_website_settings"></a> [website\_settings](#input\_website\_settings) | ######## Website ######## | <pre>object({<br/>    domain_name                     = string<br/>    cors_allowed_headers            = optional(list(string), ["Authorization", "Content-Length"])<br/>    cors_allowed_methods            = optional(list(string), ["GET", "POST"])<br/>    cors_additional_allowed_origins = optional(list(string), [])<br/>    cors_expose_headers             = optional(list(string), [])<br/>    cors_max_age_seconds            = optional(number, 3600)<br/>  })</pre> | n/a | yes |
 | <a name="input_www_website_redirect_enabled"></a> [www\_website\_redirect\_enabled](#input\_www\_website\_redirect\_enabled) | (Optional) Whether to redirect www subdomain. Defaults to true. | `bool` | `true` | no |
-| <a name="input_www_website_versioning_enabled"></a> [www\_website\_versioning\_enabled](#input\_www\_website\_versioning\_enabled) | (Optional) Enable versioning. Once you version-enable a bucket, it can never return to an unversioned state. You can, however, suspend versioning on that bucket. Defaults to true | `bool` | `true` | no |
-| <a name="input_www_website_versioning_mfa_delete"></a> [www\_website\_versioning\_mfa\_delete](#input\_www\_website\_versioning\_mfa\_delete) | (Optional) Enable MFA delete for either change the versioning state of your bucket or permanently delete an object version. Default is false. This cannot be used to toggle this setting but is available to allow managed buckets to reflect the state in AWS. | `bool` | `false` | no |
 
 ## Outputs
 
@@ -170,4 +154,4 @@ In order to run all checks at any point run the following command:
 | <a name="output_website_bucket_regional_domain_name"></a> [website\_bucket\_regional\_domain\_name](#output\_website\_bucket\_regional\_domain\_name) | The bucket region-specific domain name. The bucket domain name including the region name, please refer to https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region for format. Note: The AWS CloudFront allows specifying S3 region-specific endpoints when creating S3 origin, it will prevent redirect issues from CloudFront to S3 Origin URL. |
 | <a name="output_website_bucket_tags_all"></a> [website\_bucket\_tags\_all](#output\_website\_bucket\_tags\_all) | A map of tags assigned to the resource, including those inherited from the provider default\_tags configuration block. |
 | <a name="output_website_logs_bucket_id"></a> [website\_logs\_bucket\_id](#output\_website\_logs\_bucket\_id) | The name of the bucket which holds the access logs |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->

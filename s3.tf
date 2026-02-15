@@ -1,35 +1,19 @@
-#------------------------------------------------------------------------------
-# CloudFront Origin Access Identity
-#------------------------------------------------------------------------------
-resource "aws_cloudfront_origin_access_identity" "cf_oai" {
-  provider = aws.main
-
-  comment = "OAI to restrict access to AWS S3 content"
-}
-
-#------------------------------------------------------------------------------
+###################
 # Website S3 Bucket
-#------------------------------------------------------------------------------
-#tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging
+###################
 resource "aws_s3_bucket" "website" {
-  # tfsec:ignore:AWS017
   provider = aws.main
 
-  bucket        = local.website_bucket_name
-  force_destroy = var.website_bucket_force_destroy
+  bucket              = local.website_bucket_name
+  force_destroy       = var.website_bucket.force_destroy
+  object_lock_enabled = var.website_bucket.object_lock_enabled
 
-  # TODO - Add Lifecyle rule parameters
-  # lifecycle_rule - (Optional) A configuration of object lifecycle management.
-
-  # TODO - Add replication configuration parameters
-  # replication_configuration - (Optional) A configuration of replication configuration.
-
-  # TODO - Add variables for S3 object locking
-  # object_lock_configuration - (Optional) A configuration of S3 object locking
-
-  tags = merge({
-    Name = "${var.name_prefix}-website"
-  }, var.tags)
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.name_prefix}-website"
+    }
+  )
 }
 
 resource "aws_s3_bucket_versioning" "website" {
@@ -37,8 +21,8 @@ resource "aws_s3_bucket_versioning" "website" {
 
   bucket = aws_s3_bucket.website.id
   versioning_configuration {
-    status     = var.website_versioning_status
-    mfa_delete = var.website_versioning_mfa_delete
+    status     = var.website_bucket.versioning.status
+    mfa_delete = var.website_bucket.versioning.mfa_delete
   }
 }
 
@@ -48,15 +32,15 @@ resource "aws_s3_bucket_cors_configuration" "website" {
   bucket = aws_s3_bucket.website.id
 
   cors_rule {
-    allowed_headers = var.website_cors_allowed_headers
-    allowed_methods = var.website_cors_allowed_methods
+    allowed_headers = var.website_settings.cors_allowed_headers
+    allowed_methods = var.website_settings.cors_allowed_methods
     allowed_origins = concat(
       ((var.cloudfront_viewer_protocol_policy == "allow-all") ?
-        ["http://${var.website_domain_name}", "https://${var.website_domain_name}"] :
-      ["https://${var.website_domain_name}"]),
-    var.website_cors_additional_allowed_origins)
-    expose_headers  = var.website_cors_expose_headers
-    max_age_seconds = var.website_cors_max_age_seconds
+        ["http://${var.website_settings.domain_name}", "https://${var.website_settings.domain_name}"] :
+      ["https://${var.website_settings.domain_name}"]),
+    var.website_settings.cors_additional_allowed_origins)
+    expose_headers  = var.website_settings.cors_expose_headers
+    max_age_seconds = var.website_settings.cors_max_age_seconds
   }
 }
 
@@ -65,7 +49,7 @@ resource "aws_s3_bucket_logging" "website" {
 
   bucket        = aws_s3_bucket.website.id
   target_bucket = module.s3_logs_bucket.s3_bucket_id
-  target_prefix = "website/"
+  target_prefix = local.website_bucket_name
 }
 
 resource "aws_s3_bucket_ownership_controls" "website" {
@@ -82,7 +66,7 @@ resource "aws_s3_bucket_acl" "website" {
   provider   = aws.main
 
   bucket = aws_s3_bucket.website.id
-  acl    = var.website_bucket_acl
+  acl    = var.website_bucket.acl
 }
 
 resource "aws_s3_bucket_policy" "website" {
@@ -95,7 +79,7 @@ resource "aws_s3_bucket_policy" "website" {
   })
 }
 
-resource "aws_s3_bucket_public_access_block" "website_bucket_public_access_block" {
+resource "aws_s3_bucket_public_access_block" "website" {
   provider = aws.main
 
   bucket                  = aws_s3_bucket.website.id
@@ -105,7 +89,7 @@ resource "aws_s3_bucket_public_access_block" "website_bucket_public_access_block
   block_public_policy     = true
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "website_bucket_website_server_side_encryption_configuration" {
+resource "aws_s3_bucket_server_side_encryption_configuration" "website" {
   provider = aws.main
   count    = length(keys(var.website_server_side_encryption_configuration)) > 0 ? 1 : 0
 
