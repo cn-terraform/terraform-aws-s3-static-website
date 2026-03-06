@@ -42,8 +42,8 @@ In order to run all checks at any point run the following command:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws.acm_provider"></a> [aws.acm\_provider](#provider\_aws.acm\_provider) | >= 4.0 |
-| <a name="provider_aws.main"></a> [aws.main](#provider\_aws.main) | >= 4.0 |
+| <a name="provider_aws.acm_provider"></a> [aws.acm\_provider](#provider\_aws.acm\_provider) | 6.35.1 |
+| <a name="provider_aws.main"></a> [aws.main](#provider\_aws.main) | 6.35.1 |
 
 ## Modules
 
@@ -110,7 +110,8 @@ In order to run all checks at any point run the following command:
 | <a name="input_name_prefix"></a> [name\_prefix](#input\_name\_prefix) | Name prefix for resources on AWS | `any` | n/a | yes |
 | <a name="input_route53_hosted_zone_id"></a> [route53\_hosted\_zone\_id](#input\_route53\_hosted\_zone\_id) | The Route 53 hosted zone ID to use if create\_route53\_hosted\_zone is false | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Resource tags | `map(string)` | `{}` | no |
-| <a name="input_website_bucket_acl"></a> [website\_bucket\_acl](#input\_website\_bucket\_acl) | (Optional) The canned ACL to apply. Valid values are private, public-read, public-read-write, aws-exec-read, authenticated-read, and log-delivery-write. Defaults to private. | `string` | `"private"` | no |
+| <a name="input_website_bucket_acl"></a> [website\_bucket\_acl](#input\_website\_bucket\_acl) | (Optional) The canned ACL to apply when website\_bucket\_acl\_enabled is true. Valid values are private, public-read, public-read-write, aws-exec-read, authenticated-read, and log-delivery-write. Defaults to private. | `string` | `"private"` | no |
+| <a name="input_website_bucket_acl_enabled"></a> [website\_bucket\_acl\_enabled](#input\_website\_bucket\_acl\_enabled) | (Optional) Whether to manage and apply bucket ACL settings. Keep true for backward compatibility. Set to false to disable ACL usage (BucketOwnerEnforced), which helps avoid cross-account object upload 403 errors. Defaults to true. | `bool` | `true` | no |
 | <a name="input_website_bucket_force_destroy"></a> [website\_bucket\_force\_destroy](#input\_website\_bucket\_force\_destroy) | (Optional, Default:false) A boolean that indicates all objects (including any locked objects) should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable. | `bool` | `false` | no |
 | <a name="input_website_bucket_policy"></a> [website\_bucket\_policy](#input\_website\_bucket\_policy) | (Optional) Map containing the IAM policy for the website bucket. Defaults to null and the policy will be generated automatically. | `any` | `null` | no |
 | <a name="input_website_cors_additional_allowed_origins"></a> [website\_cors\_additional\_allowed\_origins](#input\_website\_cors\_additional\_allowed\_origins) | (Optional) Specifies which origins are allowed besides the domain name specified | `list(string)` | `[]` | no |

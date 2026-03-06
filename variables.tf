@@ -47,9 +47,15 @@ variable "website_domain_name" {
 }
 
 variable "website_bucket_acl" {
-  description = "(Optional) The canned ACL to apply. Valid values are private, public-read, public-read-write, aws-exec-read, authenticated-read, and log-delivery-write. Defaults to private."
+  description = "(Optional) The canned ACL to apply when website_bucket_acl_enabled is true. Valid values are private, public-read, public-read-write, aws-exec-read, authenticated-read, and log-delivery-write. Defaults to private."
   type        = string
   default     = "private"
+}
+
+variable "website_bucket_acl_enabled" {
+  description = "(Optional) Whether to manage and apply bucket ACL settings. Keep true for backward compatibility. Set to false to disable ACL usage (BucketOwnerEnforced), which helps avoid cross-account object upload 403 errors. Defaults to true."
+  type        = bool
+  default     = true
 }
 
 variable "website_bucket_force_destroy" {
