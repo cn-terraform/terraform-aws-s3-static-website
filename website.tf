@@ -73,11 +73,13 @@ resource "aws_s3_bucket_ownership_controls" "website" {
 
   bucket = aws_s3_bucket.website.id
   rule {
-    object_ownership = "BucketOwnerPreferred"
+    object_ownership = var.website_bucket_acl_enabled ? "BucketOwnerPreferred" : "BucketOwnerEnforced"
   }
 }
 
 resource "aws_s3_bucket_acl" "website" {
+  count = var.website_bucket_acl_enabled ? 1 : 0
+
   depends_on = [aws_s3_bucket_ownership_controls.website]
   provider   = aws.main
 
